@@ -1,0 +1,585 @@
+<?xml version="1.0"?>
+<Model>
+  <Description>mwf9307193_df79_4e62_8074_96807681188e</Description>
+  <NumberOfReactions>34</NumberOfReactions>
+  <NumberOfSpecies>21</NumberOfSpecies>
+  <ParametersList>
+    <Parameter>
+      <Id>mw7f5ccd87_7dc3_40ae_80e7_72f36cfeb741</Id>
+      <Expression>4e-012</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mw26408861_97c6_414f_95c8_2480c4e7828c</Id>
+      <Expression>4</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mw8c09c78d_9b99_4a05_8e31_ca90a7e5254f</Id>
+      <Expression>183</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mw4c8f110d_0336_4979_9ffc_8e359f565ef8</Id>
+      <Expression>0.25</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mw705b2b9a_8e05_49f0_8e21_e52d2ed78f5e</Id>
+      <Expression>0.000288</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mw8a4194ca_90cf_4ed5_89d0_fc3986f478a1</Id>
+      <Expression>0.00031</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mw8e61531b_ec2c_4076_ae43_b4c5622dcf2c</Id>
+      <Expression>0.000418</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mwcffe9d46_e0eb_4bbd_9b5b_ed476056d5a5</Id>
+      <Expression>0.00031</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mwd38ea167_5cb6_4707_a043_516d82a8fef5</Id>
+      <Expression>0.000418</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mw1a59ba47_ad43_4f4e_ba26_de0fff4ccb22</Id>
+      <Expression>0.00031</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mw5b606d42_39b2_41ad_b8cf_9ca0a62ad2f5</Id>
+      <Expression>0.000418</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mwcfdc270f_fb2f_49eb_b100_b9c98e84e6ba</Id>
+      <Expression>0.000333</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mw622889ea_eb26_4804_9cda_9e819369517a</Id>
+      <Expression>0.037</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mw7069da61_83a3_4904_a915_6b5a1c81fe38</Id>
+      <Expression>0.007</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mw311c4a5c_3bf6_436e_b02b_997962742085</Id>
+      <Expression>0.002</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mw7cd7d404_d997_487c_96fb_ff43938f186d</Id>
+      <Expression>0.01</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mw5115929c_82a3_478d_8162_c3fc0f95dfd9</Id>
+      <Expression>0.001</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mw58af03a9_3c04_4579_956b_0738a853561a</Id>
+      <Expression>1e-005</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mwa440730e_0b3a_4325_aa92_4efb7456f16c</Id>
+      <Expression>0.000288</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mw6ffd780e_86e6_4b0e_8e47_4dd47219629c</Id>
+      <Expression>9.67e-005</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mwec960d97_fd97_4b8d_955d_d840470984ac</Id>
+      <Expression>1e-005</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mwcbfe7b8c_2989_4ac2_868f_898451f0cef7</Id>
+      <Expression>0.000333</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mwdc74b715_0d53_4dc3_a5f5_837aecfdb1c5</Id>
+      <Expression>0.078</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mw2506cda1_b4dc_4875_95d8_e17c08aa38ae</Id>
+      <Expression>0.303</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mwffc9b8c5_c0f2_49bb_bceb_7d79f23250d3</Id>
+      <Expression>2.16e-005</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mw61b55637_2600_4371_824c_a2022c21d48c</Id>
+      <Expression>0.007</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mw92a0d831_2f2a_43e4_b68b_b0674b17d8af</Id>
+      <Expression>9.67e-005</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mwae529a2b_8d4d_4915_95c3_cf656cea8afb</Id>
+      <Expression>9.67e-005</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mw89c17eb8_41f2_4279_85c0_efc69ba2a935</Id>
+      <Expression>1.84e-006</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mw8287bf96_46b1_4222_a5ea_8dbbaf81eade</Id>
+      <Expression>2e-008</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mw7ef8eca2_2891_4628_a653_5dae90611f17</Id>
+      <Expression>0.000288</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mw4af607ce_db8e_4328_b58f_b6f0c34578db</Id>
+      <Expression>0.303</Expression>
+    </Parameter>
+    <Parameter>
+      <Id>mw24ee47e9_a57b_4380_af41_5db669c099c3</Id>
+      <Expression>1.84e-006</Expression>
+    </Parameter>
+  </ParametersList>
+  <ReactionsList>
+    <Reaction>
+      <Id>mw6918d864_9d55_40e3_b4e0_388f99af4d33</Id>
+      <Type>customized</Type>
+      <PropensityFunction>mw622889ea_eb26_4804_9cda_9e819369517a * mw1c97cb5d_ff52_4648_b6a3_4b0f7eabf2e8 * (pow(mw8c09c78d_9b99_4a05_8e31_ca90a7e5254f, 4) / (pow(mw8c09c78d_9b99_4a05_8e31_ca90a7e5254f, 4) + pow(mw1900fa02_6ee4_47ff_8293_b604b27546bb, 4)) + mw4c8f110d_0336_4979_9ffc_8e359f565ef8) / (1 + mw4c8f110d_0336_4979_9ffc_8e359f565ef8)</PropensityFunction>
+      <Reactants>
+        <SpeciesReference id="mw1c97cb5d_ff52_4648_b6a3_4b0f7eabf2e8" stoichiometry="1"/>
+      </Reactants>
+      <Products>
+        <SpeciesReference id="mwe4c90304_0098_44c3_8065_0455165af86b" stoichiometry="1"/>
+        <SpeciesReference id="mw1c97cb5d_ff52_4648_b6a3_4b0f7eabf2e8" stoichiometry="1"/>
+      </Products>
+    </Reaction>
+    <Reaction>
+      <Id>mw11897ba4_3a4a_4db3_90b3_254d1f875278</Id>
+      <Type>mass-action</Type>
+      <Rate>mw311c4a5c_3bf6_436e_b02b_997962742085</Rate>
+      <Reactants>
+        <SpeciesReference id="mwe4c90304_0098_44c3_8065_0455165af86b" stoichiometry="1"/>
+      </Reactants>
+      <Products>
+        <SpeciesReference id="mw77d70b97_de77_4d17_ae1f_c8c833fafef1" stoichiometry="1"/>
+        <SpeciesReference id="mw302276ea_1ce7_4223_a951_44341a612cb9" stoichiometry="1"/>
+      </Products>
+    </Reaction>
+    <Reaction>
+      <Id>mw97bf6f63_5c1d_4dc4_8379_87ec47da00c2</Id>
+      <Type>mass-action</Type>
+      <Rate>mw7cd7d404_d997_487c_96fb_ff43938f186d</Rate>
+      <Reactants>
+        <SpeciesReference id="mw302276ea_1ce7_4223_a951_44341a612cb9" stoichiometry="1"/>
+      </Reactants>
+      <Products>
+        <SpeciesReference id="mw09551496_cfb7_47cc_9498_af47981c0b1c" stoichiometry="1"/>
+      </Products>
+    </Reaction>
+    <Reaction>
+      <Id>mw20228697_7078_46bf_a4c1_1a8433180bb9</Id>
+      <Type>mass-action</Type>
+      <Rate>mw5115929c_82a3_478d_8162_c3fc0f95dfd9</Rate>
+      <Reactants>
+        <SpeciesReference id="mw09551496_cfb7_47cc_9498_af47981c0b1c" stoichiometry="1"/>
+      </Reactants>
+      <Products>
+        <SpeciesReference id="mw1220cb6e_64e5_4247_b270_7464f3581cd7" stoichiometry="1"/>
+      </Products>
+    </Reaction>
+    <Reaction>
+      <Id>mwf0f3c65e_e00d_4ccb_98f1_c6f7935044dd</Id>
+      <Type>mass-action</Type>
+      <Rate>mw58af03a9_3c04_4579_956b_0738a853561a</Rate>
+      <Reactants>
+        <SpeciesReference id="mw1220cb6e_64e5_4247_b270_7464f3581cd7" stoichiometry="1"/>
+        <SpeciesReference id="mw7d315641_4265_4266_981e_f12c4a2121f1" stoichiometry="1"/>
+      </Reactants>
+      <Products>
+        <SpeciesReference id="mw890cd406_13ba_4812_9787_69fabab0b50c" stoichiometry="1"/>
+      </Products>
+    </Reaction>
+    <Reaction>
+      <Id>mw3e88bebf_301d_46e0_a4b4_dfed4f283aed</Id>
+      <Type>mass-action</Type>
+      <Rate>mwa440730e_0b3a_4325_aa92_4efb7456f16c</Rate>
+      <Reactants>
+        <SpeciesReference id="mw1220cb6e_64e5_4247_b270_7464f3581cd7" stoichiometry="1"/>
+      </Reactants>
+    </Reaction>
+    <Reaction>
+      <Id>mw1f10fa9a_f6f2_430c_9bae_eb9829f8d861</Id>
+      <Type>mass-action</Type>
+      <Rate>mw6ffd780e_86e6_4b0e_8e47_4dd47219629c</Rate>
+      <Reactants>
+        <SpeciesReference id="mw81e73efb_3554_4772_93bd_a09de065b7b9" stoichiometry="1"/>
+      </Reactants>
+    </Reaction>
+    <Reaction>
+      <Id>mw12239900_57b5_469a_a74d_a2a3dcf11305</Id>
+      <Type>mass-action</Type>
+      <Rate>mwec960d97_fd97_4b8d_955d_d840470984ac</Rate>
+      <Reactants>
+        <SpeciesReference id="mw1900fa02_6ee4_47ff_8293_b604b27546bb" stoichiometry="1"/>
+        <SpeciesReference id="mwb82abfe2_70ec_4681_970f_151292ee8da4" stoichiometry="1"/>
+      </Reactants>
+      <Products>
+        <SpeciesReference id="mw741faaa1_960a_417c_b6ab_968711153dd4" stoichiometry="1"/>
+      </Products>
+    </Reaction>
+    <Reaction>
+      <Id>mwf3a7ef1e_74d3_401c_8fdd_113c2a7ab764</Id>
+      <Type>mass-action</Type>
+      <Rate>mwcbfe7b8c_2989_4ac2_868f_898451f0cef7</Rate>
+      <Reactants>
+        <SpeciesReference id="mwb82abfe2_70ec_4681_970f_151292ee8da4" stoichiometry="1"/>
+      </Reactants>
+    </Reaction>
+    <Reaction>
+      <Id>mw8730ada3_a2a3_4e1d_b336_1f5370e56979</Id>
+      <Type>mass-action</Type>
+      <Rate>mwdc74b715_0d53_4dc3_a5f5_837aecfdb1c5</Rate>
+      <Products>
+        <SpeciesReference id="mwb82abfe2_70ec_4681_970f_151292ee8da4" stoichiometry="1"/>
+      </Products>
+    </Reaction>
+    <Reaction>
+      <Id>mwfe7fe8e9_835f_4119_a45b_3bc69e5c6b5a</Id>
+      <Type>mass-action</Type>
+      <Rate>mw705b2b9a_8e05_49f0_8e21_e52d2ed78f5e</Rate>
+      <Reactants>
+        <SpeciesReference id="mw77d70b97_de77_4d17_ae1f_c8c833fafef1" stoichiometry="1"/>
+      </Reactants>
+    </Reaction>
+    <Reaction>
+      <Id>mw8e43a43c_41ef_4921_ad9d_1ea588c9166f</Id>
+      <Type>mass-action</Type>
+      <Rate>mw2506cda1_b4dc_4875_95d8_e17c08aa38ae</Rate>
+      <Reactants>
+        <SpeciesReference id="mw90a79b08_3e25_4eec_ac3c_971126ababaa" stoichiometry="1"/>
+      </Reactants>
+      <Products>
+        <SpeciesReference id="mw02d2c27c_7563_44e5_8fca_43ffbcf5747f" stoichiometry="1"/>
+        <SpeciesReference id="mw890cd406_13ba_4812_9787_69fabab0b50c" stoichiometry="1"/>
+      </Products>
+    </Reaction>
+    <Reaction>
+      <Id>mw36269b8c_42dc_4452_b2fc_d54fdbe1ebf9</Id>
+      <Type>mass-action</Type>
+      <Rate>mwffc9b8c5_c0f2_49bb_bceb_7d79f23250d3</Rate>
+      <Reactants>
+        <SpeciesReference id="mw890cd406_13ba_4812_9787_69fabab0b50c" stoichiometry="1"/>
+      </Reactants>
+      <Products>
+        <SpeciesReference id="mw7d315641_4265_4266_981e_f12c4a2121f1" stoichiometry="1"/>
+      </Products>
+    </Reaction>
+    <Reaction>
+      <Id>mw4417af9a_4aa0_494e_8462_7201c4e834ab</Id>
+      <Type>mass-action</Type>
+      <Rate>mw61b55637_2600_4371_824c_a2022c21d48c</Rate>
+      <Reactants>
+        <SpeciesReference id="mw90a79b08_3e25_4eec_ac3c_971126ababaa" stoichiometry="1"/>
+      </Reactants>
+      <Products>
+        <SpeciesReference id="mw890cd406_13ba_4812_9787_69fabab0b50c" stoichiometry="1"/>
+      </Products>
+    </Reaction>
+    <Reaction>
+      <Id>mwfe69e0ad_d1e4_44d6_8b94_853448715c04</Id>
+      <Type>mass-action</Type>
+      <Rate>mw92a0d831_2f2a_43e4_b68b_b0674b17d8af</Rate>
+      <Reactants>
+        <SpeciesReference id="mw1900fa02_6ee4_47ff_8293_b604b27546bb" stoichiometry="1"/>
+      </Reactants>
+    </Reaction>
+    <Reaction>
+      <Id>mw6950a8a7_7cf8_4cb9_aa59_73997a4e00b6</Id>
+      <Type>mass-action</Type>
+      <Rate>mwae529a2b_8d4d_4915_95c3_cf656cea8afb</Rate>
+      <Reactants>
+        <SpeciesReference id="mw741faaa1_960a_417c_b6ab_968711153dd4" stoichiometry="1"/>
+      </Reactants>
+    </Reaction>
+    <Reaction>
+      <Id>mwc387aaa1_a897_4c0c_85d8_8a337a85952f</Id>
+      <Type>mass-action</Type>
+      <Rate>mw89c17eb8_41f2_4279_85c0_efc69ba2a935</Rate>
+      <Reactants>
+        <SpeciesReference id="mw02d2c27c_7563_44e5_8fca_43ffbcf5747f" stoichiometry="1"/>
+        <SpeciesReference id="mw890cd406_13ba_4812_9787_69fabab0b50c" stoichiometry="1"/>
+      </Reactants>
+      <Products>
+        <SpeciesReference id="mw90a79b08_3e25_4eec_ac3c_971126ababaa" stoichiometry="1"/>
+      </Products>
+    </Reaction>
+    <Reaction>
+      <Id>mw95c7fd04_a86e_4aaf_a6f9_bca2520522cc</Id>
+      <Type>mass-action</Type>
+      <Rate>mw8287bf96_46b1_4222_a5ea_8dbbaf81eade</Rate>
+      <Reactants>
+        <SpeciesReference id="mw741faaa1_960a_417c_b6ab_968711153dd4" stoichiometry="1"/>
+      </Reactants>
+      <Products>
+        <SpeciesReference id="mw1900fa02_6ee4_47ff_8293_b604b27546bb" stoichiometry="1"/>
+        <SpeciesReference id="mwb82abfe2_70ec_4681_970f_151292ee8da4" stoichiometry="1"/>
+      </Products>
+    </Reaction>
+    <Reaction>
+      <Id>mw156dfce6_0908_48fc_b979_6ce66d3fbda1</Id>
+      <Type>mass-action</Type>
+      <Rate>mw7ef8eca2_2891_4628_a653_5dae90611f17</Rate>
+      <Reactants>
+        <SpeciesReference id="mwe4c90304_0098_44c3_8065_0455165af86b" stoichiometry="1"/>
+      </Reactants>
+    </Reaction>
+    <Reaction>
+      <Id>mw6a121e4f_7771_45f9_a6b2_8286a78a9c03</Id>
+      <Type>customized</Type>
+      <PropensityFunction>mw622889ea_eb26_4804_9cda_9e819369517a * mw75a1ade5_6b72_47d5_a9b8_ecfa521a3874 * (pow(mw8c09c78d_9b99_4a05_8e31_ca90a7e5254f, 4) / (pow(mw8c09c78d_9b99_4a05_8e31_ca90a7e5254f, 4) + pow(mw1900fa02_6ee4_47ff_8293_b604b27546bb, 4)) + mw4c8f110d_0336_4979_9ffc_8e359f565ef8) / (1 + mw4c8f110d_0336_4979_9ffc_8e359f565ef8)</PropensityFunction>
+      <Reactants>
+        <SpeciesReference id="mw75a1ade5_6b72_47d5_a9b8_ecfa521a3874" stoichiometry="1"/>
+      </Reactants>
+      <Products>
+        <SpeciesReference id="mw02d2c27c_7563_44e5_8fca_43ffbcf5747f" stoichiometry="1"/>
+        <SpeciesReference id="mw75a1ade5_6b72_47d5_a9b8_ecfa521a3874" stoichiometry="1"/>
+      </Products>
+    </Reaction>
+    <Reaction>
+      <Id>mw1cd3f3c9_8667_4bfd_a33f_2fce7d17abcc</Id>
+      <Type>mass-action</Type>
+      <Rate>mw705b2b9a_8e05_49f0_8e21_e52d2ed78f5e</Rate>
+      <Reactants>
+        <SpeciesReference id="mw02d2c27c_7563_44e5_8fca_43ffbcf5747f" stoichiometry="1"/>
+      </Reactants>
+    </Reaction>
+    <Reaction>
+      <Id>mw7b801135_fd11_4e9e_8140_01b667c847ad</Id>
+      <Type>mass-action</Type>
+      <Rate>mwcfdc270f_fb2f_49eb_b100_b9c98e84e6ba</Rate>
+      <Reactants>
+        <SpeciesReference id="mw02d2c27c_7563_44e5_8fca_43ffbcf5747f" stoichiometry="1"/>
+      </Reactants>
+      <Products>
+        <SpeciesReference id="mw1900fa02_6ee4_47ff_8293_b604b27546bb" stoichiometry="1"/>
+        <SpeciesReference id="mw02d2c27c_7563_44e5_8fca_43ffbcf5747f" stoichiometry="1"/>
+      </Products>
+    </Reaction>
+    <Reaction>
+      <Id>mwb9160028_8c0e_45ca_b2b9_63c80d521798</Id>
+      <Type>mass-action</Type>
+      <Rate>mw4af607ce_db8e_4328_b58f_b6f0c34578db</Rate>
+      <Reactants>
+        <SpeciesReference id="mw2552d4c7_680c_4c31_8260_d44561dd1379" stoichiometry="1"/>
+      </Reactants>
+      <Products>
+        <SpeciesReference id="mwbb9d0db2_7e33_4e77_94fb_bb58594fedd1" stoichiometry="1"/>
+        <SpeciesReference id="mw890cd406_13ba_4812_9787_69fabab0b50c" stoichiometry="1"/>
+      </Products>
+    </Reaction>
+    <Reaction>
+      <Id>mw107cbd1a_a079_4b9c_ac95_0f6b3ef7da4e</Id>
+      <Type>mass-action</Type>
+      <Rate>mw705b2b9a_8e05_49f0_8e21_e52d2ed78f5e</Rate>
+      <Reactants>
+        <SpeciesReference id="mwbb9d0db2_7e33_4e77_94fb_bb58594fedd1" stoichiometry="1"/>
+      </Reactants>
+    </Reaction>
+    <Reaction>
+      <Id>mw59de2948_336c_4ce3_8f98_81f41703aa7c</Id>
+      <Type>customized</Type>
+      <PropensityFunction>mw622889ea_eb26_4804_9cda_9e819369517a * mw51fed5e3_b0bc_408d_b807_39eca9bee5c2 * (pow(mw8c09c78d_9b99_4a05_8e31_ca90a7e5254f, 4) / (pow(mw8c09c78d_9b99_4a05_8e31_ca90a7e5254f, 4) + pow(mw1900fa02_6ee4_47ff_8293_b604b27546bb, 4)) + mw4c8f110d_0336_4979_9ffc_8e359f565ef8) / (1 + mw4c8f110d_0336_4979_9ffc_8e359f565ef8)</PropensityFunction>
+      <Reactants>
+        <SpeciesReference id="mw51fed5e3_b0bc_408d_b807_39eca9bee5c2" stoichiometry="1"/>
+      </Reactants>
+      <Products>
+        <SpeciesReference id="mwbb9d0db2_7e33_4e77_94fb_bb58594fedd1" stoichiometry="1"/>
+        <SpeciesReference id="mw51fed5e3_b0bc_408d_b807_39eca9bee5c2" stoichiometry="1"/>
+      </Products>
+    </Reaction>
+    <Reaction>
+      <Id>mw8e761ee1_1e2b_4f24_a0ac_c20ca7ef58a8</Id>
+      <Type>mass-action</Type>
+      <Rate>mw24ee47e9_a57b_4380_af41_5db669c099c3</Rate>
+      <Reactants>
+        <SpeciesReference id="mwbb9d0db2_7e33_4e77_94fb_bb58594fedd1" stoichiometry="1"/>
+        <SpeciesReference id="mw890cd406_13ba_4812_9787_69fabab0b50c" stoichiometry="1"/>
+      </Reactants>
+      <Products>
+        <SpeciesReference id="mw2552d4c7_680c_4c31_8260_d44561dd1379" stoichiometry="1"/>
+      </Products>
+    </Reaction>
+    <Reaction>
+      <Id>mw2970e3d5_0649_42a6_b817_983aa758ca46</Id>
+      <Type>mass-action</Type>
+      <Rate>mw8a4194ca_90cf_4ed5_89d0_fc3986f478a1</Rate>
+      <Reactants>
+        <SpeciesReference id="mw365c443f_f151_458d_b5a5_4e8b198ad819" stoichiometry="1"/>
+      </Reactants>
+      <Products>
+        <SpeciesReference id="mw1c97cb5d_ff52_4648_b6a3_4b0f7eabf2e8" stoichiometry="1"/>
+      </Products>
+    </Reaction>
+    <Reaction>
+      <Id>mw9edea1fb_c021_4f39_99c6_21094e7382b9</Id>
+      <Type>mass-action</Type>
+      <Rate>mw8e61531b_ec2c_4076_ae43_b4c5622dcf2c</Rate>
+      <Reactants>
+        <SpeciesReference id="mw1c97cb5d_ff52_4648_b6a3_4b0f7eabf2e8" stoichiometry="1"/>
+      </Reactants>
+      <Products>
+        <SpeciesReference id="mw365c443f_f151_458d_b5a5_4e8b198ad819" stoichiometry="1"/>
+      </Products>
+    </Reaction>
+    <Reaction>
+      <Id>mw2e04b6b7_cb35_4c1d_94a4_d408ebe514ac</Id>
+      <Type>mass-action</Type>
+      <Rate>mwcffe9d46_e0eb_4bbd_9b5b_ed476056d5a5</Rate>
+      <Reactants>
+        <SpeciesReference id="mw7f885039_9605_40e5_8d28_ec27efb2382f" stoichiometry="1"/>
+      </Reactants>
+      <Products>
+        <SpeciesReference id="mw75a1ade5_6b72_47d5_a9b8_ecfa521a3874" stoichiometry="1"/>
+      </Products>
+    </Reaction>
+    <Reaction>
+      <Id>mw2314758d_f2d6_4f77_a1be_a74a3575cdf5</Id>
+      <Type>mass-action</Type>
+      <Rate>mwd38ea167_5cb6_4707_a043_516d82a8fef5</Rate>
+      <Reactants>
+        <SpeciesReference id="mw75a1ade5_6b72_47d5_a9b8_ecfa521a3874" stoichiometry="1"/>
+      </Reactants>
+      <Products>
+        <SpeciesReference id="mw7f885039_9605_40e5_8d28_ec27efb2382f" stoichiometry="1"/>
+      </Products>
+    </Reaction>
+    <Reaction>
+      <Id>mwe5e9c6d3_8157_4b75_9201_9c29e2e9b4f8</Id>
+      <Type>mass-action</Type>
+      <Rate>mw1a59ba47_ad43_4f4e_ba26_de0fff4ccb22</Rate>
+      <Reactants>
+        <SpeciesReference id="mw80be7b36_29b5_4984_8543_bfda5defbe1d" stoichiometry="1"/>
+      </Reactants>
+      <Products>
+        <SpeciesReference id="mw51fed5e3_b0bc_408d_b807_39eca9bee5c2" stoichiometry="1"/>
+      </Products>
+    </Reaction>
+    <Reaction>
+      <Id>mw69a9cab7_396d_49df_86a3_12ca1f96b6a1</Id>
+      <Type>mass-action</Type>
+      <Rate>mw5b606d42_39b2_41ad_b8cf_9ca0a62ad2f5</Rate>
+      <Reactants>
+        <SpeciesReference id="mw51fed5e3_b0bc_408d_b807_39eca9bee5c2" stoichiometry="1"/>
+      </Reactants>
+      <Products>
+        <SpeciesReference id="mw80be7b36_29b5_4984_8543_bfda5defbe1d" stoichiometry="1"/>
+      </Products>
+    </Reaction>
+    <Reaction>
+      <Id>mw40126595_697d_44f3_bb05_ffa07a987433</Id>
+      <Type>mass-action</Type>
+      <Rate>mwcfdc270f_fb2f_49eb_b100_b9c98e84e6ba</Rate>
+      <Reactants>
+        <SpeciesReference id="mwbb9d0db2_7e33_4e77_94fb_bb58594fedd1" stoichiometry="1"/>
+      </Reactants>
+      <Products>
+        <SpeciesReference id="mw81e73efb_3554_4772_93bd_a09de065b7b9" stoichiometry="1"/>
+        <SpeciesReference id="mwbb9d0db2_7e33_4e77_94fb_bb58594fedd1" stoichiometry="1"/>
+      </Products>
+    </Reaction>
+    <Reaction>
+      <Id>mw0da7a0ec_f20b_4d72_bf67_9af9bcd74374</Id>
+      <Type>mass-action</Type>
+      <Rate>mw7069da61_83a3_4904_a915_6b5a1c81fe38</Rate>
+      <Reactants>
+        <SpeciesReference id="mw2552d4c7_680c_4c31_8260_d44561dd1379" stoichiometry="1"/>
+      </Reactants>
+      <Products>
+        <SpeciesReference id="mw890cd406_13ba_4812_9787_69fabab0b50c" stoichiometry="1"/>
+      </Products>
+    </Reaction>
+  </ReactionsList>
+  <SpeciesList>
+    <Species>
+      <Id>mwe4c90304_0098_44c3_8065_0455165af86b</Id>
+      <InitialPopulation>35</InitialPopulation>
+    </Species>
+    <Species>
+      <Id>mw1c97cb5d_ff52_4648_b6a3_4b0f7eabf2e8</Id>
+      <InitialPopulation>4</InitialPopulation>
+    </Species>
+    <Species>
+      <Id>mw1900fa02_6ee4_47ff_8293_b604b27546bb</Id>
+      <InitialPopulation>177</InitialPopulation>
+    </Species>
+    <Species>
+      <Id>mw302276ea_1ce7_4223_a951_44341a612cb9</Id>
+      <InitialPopulation>6</InitialPopulation>
+    </Species>
+    <Species>
+      <Id>mw09551496_cfb7_47cc_9498_af47981c0b1c</Id>
+      <InitialPopulation>101</InitialPopulation>
+    </Species>
+    <Species>
+      <Id>mw77d70b97_de77_4d17_ae1f_c8c833fafef1</Id>
+      <InitialPopulation>321</InitialPopulation>
+    </Species>
+    <Species>
+      <Id>mw81e73efb_3554_4772_93bd_a09de065b7b9</Id>
+      <InitialPopulation>695</InitialPopulation>
+    </Species>
+    <Species>
+      <Id>mw1220cb6e_64e5_4247_b270_7464f3581cd7</Id>
+      <InitialPopulation>0</InitialPopulation>
+    </Species>
+    <Species>
+      <Id>mw890cd406_13ba_4812_9787_69fabab0b50c</Id>
+      <InitialPopulation>4225</InitialPopulation>
+    </Species>
+    <Species>
+      <Id>mwb82abfe2_70ec_4681_970f_151292ee8da4</Id>
+      <InitialPopulation>34</InitialPopulation>
+    </Species>
+    <Species>
+      <Id>mw741faaa1_960a_417c_b6ab_968711153dd4</Id>
+      <InitialPopulation>618</InitialPopulation>
+    </Species>
+    <Species>
+      <Id>mw90a79b08_3e25_4eec_ac3c_971126ababaa</Id>
+      <InitialPopulation>4</InitialPopulation>
+    </Species>
+    <Species>
+      <Id>mw7d315641_4265_4266_981e_f12c4a2121f1</Id>
+      <InitialPopulation>165761</InitialPopulation>
+    </Species>
+    <Species>
+      <Id>mw75a1ade5_6b72_47d5_a9b8_ecfa521a3874</Id>
+      <InitialPopulation>5</InitialPopulation>
+    </Species>
+    <Species>
+      <Id>mw02d2c27c_7563_44e5_8fca_43ffbcf5747f</Id>
+      <InitialPopulation>228</InitialPopulation>
+    </Species>
+    <Species>
+      <Id>mwbb9d0db2_7e33_4e77_94fb_bb58594fedd1</Id>
+      <InitialPopulation>240</InitialPopulation>
+    </Species>
+    <Species>
+      <Id>mw51fed5e3_b0bc_408d_b807_39eca9bee5c2</Id>
+      <InitialPopulation>3</InitialPopulation>
+    </Species>
+    <Species>
+      <Id>mw2552d4c7_680c_4c31_8260_d44561dd1379</Id>
+      <InitialPopulation>10</InitialPopulation>
+    </Species>
+    <Species>
+      <Id>mw365c443f_f151_458d_b5a5_4e8b198ad819</Id>
+      <InitialPopulation>6</InitialPopulation>
+    </Species>
+    <Species>
+      <Id>mw7f885039_9605_40e5_8d28_ec27efb2382f</Id>
+      <InitialPopulation>5</InitialPopulation>
+    </Species>
+    <Species>
+      <Id>mw80be7b36_29b5_4984_8543_bfda5defbe1d</Id>
+      <InitialPopulation>7</InitialPopulation>
+    </Species>
+  </SpeciesList>
+</Model>
