@@ -30,7 +30,7 @@ group_palette = {
 }
 
 def get_metadata(path):
-    metadata = pd.read_csv(path)
+    metadata = pd.read_excel(path)
     metadata['color'] = metadata['group'].replace(group_palette)
     metadata.loc[(metadata['group']=='controller') & (metadata['design']==2), 'color'] = colors['orange']
     metadata.loc[(metadata['group']=='controller') & (metadata['design']==3), 'color'] = colors['red']
