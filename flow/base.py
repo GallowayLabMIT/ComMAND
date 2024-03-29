@@ -29,13 +29,30 @@ group_palette = {
     'ts5': colors['purple'],        # TS only, in 5'UTR
 }
 
+group_markers = {
+    'un': 'H',
+    'marker': 'p',
+    'base': 'D',
+    'controller': 'o', 
+    'miR': 'P',
+    'ts3': '^',        
+    'ts5': 'v',
+}
+
 def get_metadata(path):
     metadata = pd.read_excel(path)
+
+    # Apply colors
     metadata['color'] = metadata['group'].replace(group_palette)
     metadata.loc[(metadata['group']=='controller') & (metadata['design']==2), 'color'] = colors['orange']
     metadata.loc[(metadata['group']=='controller') & (metadata['design']==3), 'color'] = colors['red']
     metadata.loc[(metadata['ts_kind']=='NT'), 'color'] = colors['gray']
     metadata.loc[(metadata['ts_num']==4), 'color'] = metadata.loc[(metadata['ts_num']==4), 'color'].apply(get_light_color)
+
+    # Apply marker styles
+    metadata['markers'] = metadata['group'].replace(group_markers)
+    metadata.loc[(metadata['group']=='controller') & (metadata['ts_kind']=='NT'), 'markers'] = 'X'
+
     return metadata
 
 def gate_data(df, gates):
@@ -47,3 +64,7 @@ def gate_data(df, gates):
     df['marker'] = df[marker]
     df['output'] = df[gates_dict['output'][exp]]
     return df
+
+def rename_multilevel_cols(index):
+    if index[1] == '': return index[0]
+    else: return index[0] + '_' + index[1]
