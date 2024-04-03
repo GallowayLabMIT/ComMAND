@@ -10,121 +10,165 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     28445,        740]
-NotebookOptionsPosition[     27293,        711]
-NotebookOutlinePosition[     27687,        727]
-CellTagsIndexPosition[     27644,        724]
+NotebookDataLength[      8740,        245]
+NotebookOptionsPosition[      7689,        217]
+NotebookOutlinePosition[      8087,        233]
+CellTagsIndexPosition[      8044,        230]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
 Notebook[{
 
 Cell[CellGroupData[{
+Cell["Solve the four variables we can immediately write down", "Section",
+ CellChangeTimes->{{3.9211627916222486`*^9, 
+  3.921162825742045*^9}},ExpressionUUID->"337ceaa0-3b9b-4dea-8e61-\
+f6e8fa82ddd7"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"immaturemiRNAEquations", "=", 
+   RowBox[{"{", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"0", "==", " ", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"-", "rSplicing"}], " ", "*", " ", "immaturemRNA"}], "+", 
+       RowBox[{"copyRegulated", "*", "aim"}], " ", "-", " ", 
+       RowBox[{"immaturemRNA", " ", "*", " ", "dim"}]}]}], ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{"0", "==", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"-", "rDrosha"}], " ", "*", " ", "pri"}], " ", "+", " ", 
+       RowBox[{"rSplicing", " ", "*", " ", "immaturemRNA"}]}]}], ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{"0", "==", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"-", "rDicer"}], "*", "pre"}], "+", 
+       RowBox[{"rDrosha", "*", "pri"}]}]}]}], "}"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"miRNASolns", " ", "=", " ", 
+  RowBox[{
+   RowBox[{"Solve", "[", 
+    RowBox[{"immaturemiRNAEquations", ",", " ", 
+     RowBox[{"{", 
+      RowBox[{"immaturemRNA", ",", " ", "pri", ",", " ", "pre"}], "}"}]}], 
+    "]"}], "[", 
+   RowBox[{"[", "1", "]"}], "]"}]}], "\[IndentingNewLine]", 
+ RowBox[{"proteinSoln", " ", "=", " ", 
+  RowBox[{
+   RowBox[{"Solve", "[", 
+    RowBox[{
+     RowBox[{"0", "==", 
+      RowBox[{
+       RowBox[{"-", "protein"}], "+", 
+       RowBox[{"mRNA", "*", "ap"}], "+", 
+       RowBox[{"RIM", "*", "ap", "*", "zeta"}]}]}], ",", "protein"}], "]"}], 
+   "[", 
+   RowBox[{"[", "1", "]"}], "]"}]}]}], "Input",
+ CellChangeTimes->{{3.921162454991544*^9, 3.92116245599844*^9}, {
+  3.921162502126766*^9, 3.921162514134863*^9}, {3.921162568294669*^9, 
+  3.9211626503211184`*^9}, {3.92116269463131*^9, 3.921162772702695*^9}},
+ CellLabel->"In[20]:=",ExpressionUUID->"93046a10-9fa9-4a37-b6b0-f08c16330dfc"],
+
 Cell[BoxData[
- RowBox[{"equations", "=", 
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"immaturemRNA", "\[Rule]", 
+    FractionBox[
+     RowBox[{"aim", " ", "copyRegulated"}], 
+     RowBox[{"dim", "+", "rSplicing"}]]}], ",", 
+   RowBox[{"pri", "\[Rule]", 
+    FractionBox[
+     RowBox[{"aim", " ", "copyRegulated", " ", "rSplicing"}], 
+     RowBox[{"rDrosha", " ", 
+      RowBox[{"(", 
+       RowBox[{"dim", "+", "rSplicing"}], ")"}]}]]}], ",", 
+   RowBox[{"pre", "\[Rule]", 
+    FractionBox[
+     RowBox[{"aim", " ", "copyRegulated", " ", "rSplicing"}], 
+     RowBox[{"rDicer", " ", 
+      RowBox[{"(", 
+       RowBox[{"dim", "+", "rSplicing"}], ")"}]}]]}]}], "}"}]], "Output",
+ CellChangeTimes->{{3.921162639305728*^9, 3.921162650541589*^9}, {
+   3.921162715166409*^9, 3.921162720385027*^9}, 3.92116277359095*^9},
+ CellLabel->"Out[21]=",ExpressionUUID->"8ab4246a-faf3-420c-ace3-de528f6777e7"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"protein", "\[Rule]", 
+   RowBox[{
+    RowBox[{"ap", " ", "mRNA"}], "+", 
+    RowBox[{"ap", " ", "RIM", " ", "zeta"}]}]}], "}"}]], "Output",
+ CellChangeTimes->{{3.921162639305728*^9, 3.921162650541589*^9}, {
+   3.921162715166409*^9, 3.921162720385027*^9}, 3.921162773592011*^9},
+ CellLabel->"Out[22]=",ExpressionUUID->"b7fcdd27-6615-4b5c-8334-e305ed346c66"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Solve the other five equations", "Section",
+ CellChangeTimes->{{3.9211628171342287`*^9, 
+  3.921162830597947*^9}},ExpressionUUID->"03e64a28-2504-4439-9027-\
+60d72a65007c"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{"riscEquations", "=", 
   RowBox[{"{", "\[IndentingNewLine]", 
    RowBox[{
     RowBox[{"0", "==", 
      RowBox[{
-      RowBox[{
-       RowBox[{"-", 
-        SubscriptBox["r", "dicer"]}], " ", "*", " ", "pre"}], " ", "+", " ", 
-      RowBox[{
-       SubscriptBox["r", "drosha"], " ", "*", " ", "pri"}]}]}], ",", 
-    "\[IndentingNewLine]", 
+      RowBox[{"rDicer", "*", "pre"}], "-", 
+      RowBox[{"miR", "*", "dmi"}], "-", 
+      RowBox[{"kmib", "*", "miR", "*", "R"}]}]}], ",", "\[IndentingNewLine]", 
+    
     RowBox[{"0", "==", 
      RowBox[{
-      RowBox[{
-       SubscriptBox["r", "dicer"], "*", "pre"}], "-", 
-      RowBox[{"miRNA", "*", 
-       SubscriptBox["d", "mi"]}], "-", 
-      RowBox[{
-       SubscriptBox["k", "mib"], "*", "miRNA", "*", "R"}]}]}], ",", 
-    "\[IndentingNewLine]", 
+      RowBox[{"kmiub", "*", "RI"}], "-", 
+      RowBox[{"kmib", "*", "miR", "*", "R"}]}]}], ",", "\[IndentingNewLine]", 
+    
     RowBox[{"0", "==", 
      RowBox[{
-      RowBox[{
-       SubscriptBox["k", "miub"], "*", "RI"}], "-", 
-      RowBox[{
-       SubscriptBox["k", "mib"], "*", "miRNA", "*", "R"}]}]}], ",", 
-    "\[IndentingNewLine]", 
-    RowBox[{"0", "==", 
-     RowBox[{
-      RowBox[{
-       SubscriptBox["k", "deg"], "*", "RIM"}], "+", 
-      RowBox[{
-       SubscriptBox["k", "mub"], "*", "RIM"}], "-", 
-      RowBox[{
-       SubscriptBox["k", "miub"], "*", "RI"}], "-", 
-      RowBox[{
-       SubscriptBox["k", "mb"], "*", "RI", "*", "mRNA"}], "+", 
-      RowBox[{
-       SubscriptBox["k", "mib"], "*", "miRNA", "*", "R"}]}]}], ",", 
-    "\[IndentingNewLine]", 
-    RowBox[{"0", "==", 
-     RowBox[{
-      RowBox[{
-       SubscriptBox["k", "mub"], "*", "RIM"}], "+", 
-      RowBox[{
-       SubscriptBox["r", "splicing"], "*", 
-       SubscriptBox["mRNA", "i"]}], "-", 
-      RowBox[{"mRNA", "*", 
-       SubscriptBox["a", "p"]}], "-", 
-      RowBox[{"mRNA", "*", 
-       SubscriptBox["d", "m"]}], "-", 
-      RowBox[{
-       SubscriptBox["k", "mb"], "*", "RI", "*", "mRNA"}]}]}], ",", 
-    "\[IndentingNewLine]", 
-    RowBox[{"0", "==", 
-     RowBox[{
-      RowBox[{
-       RowBox[{"-", 
-        SubscriptBox["k", "deg"]}], "*", "RIM"}], "-", 
-      RowBox[{
-       SubscriptBox["k", "mub"], "*", "RIM"}], "+", 
-      RowBox[{
-       SubscriptBox["k", "mb"], "*", "RI", "*", "mRNA"}], "-", 
-      RowBox[{"RIM", "*", 
-       SubscriptBox["a", "p"], "*", "zeta"}]}]}], ",", "\[IndentingNewLine]", 
+      RowBox[{"kdeg", "*", "RIM"}], "+", 
+      RowBox[{"kmub", "*", "RIM"}], "-", 
+      RowBox[{"kmiub", "*", "RI"}], "-", 
+      RowBox[{"kmb", "*", "RI", "*", "mRNA"}], "+", 
+      RowBox[{"kmib", "*", "miR", "*", "R"}]}]}], ",", "\[IndentingNewLine]", 
     
     RowBox[{"0", "==", 
      RowBox[{
       RowBox[{
-       RowBox[{"-", "P"}], "*", 
-       SubscriptBox["d", "p"]}], "+", 
-      RowBox[{"mRNA", "*", 
-       SubscriptBox["a", "p"]}], "+", 
-      RowBox[{"RIM", "*", 
-       SubscriptBox["a", "p"], "*", "zeta"}]}]}], ",", "\[IndentingNewLine]", 
-    
+       RowBox[{"-", "kdeg"}], "*", "RIM"}], "-", 
+      RowBox[{"kmub", "*", "RIM"}], "+", 
+      RowBox[{"kmb", "*", "RI", "*", "mRNA"}]}]}], ",", "\[IndentingNewLine]", 
     RowBox[{"0", "==", 
      RowBox[{
-      RowBox[{
-       RowBox[{"-", 
-        SubscriptBox["r", "splicing"]}], "*", 
-       SubscriptBox["mRNA", "i"]}], "+", 
-      RowBox[{
-       SubscriptBox["copy", "reg"], "*", 
-       SubscriptBox["a", 
-        RowBox[{"im", " "}]]}], "-", 
-      RowBox[{
-       SubscriptBox["mRNA", "i"], "*", 
-       SubscriptBox["d", "im"]}]}]}], ",", "\[IndentingNewLine]", 
-    RowBox[{"0", "==", 
-     RowBox[{
-      RowBox[{
-       RowBox[{"-", 
-        SubscriptBox["r", "drosha"]}], "*", "pri"}], "+", 
-      RowBox[{
-       SubscriptBox["r", "splicing"], "*", 
-       SubscriptBox["mRNA", "i"]}]}]}], ",", "\[IndentingNewLine]", 
-    RowBox[{"R", ">", "0"}], ",", " ", 
-    RowBox[{"RI", ">", "0"}], ",", 
-    RowBox[{"RIM", ">", "0"}]}], "}"}]}]], "Input",
- CellChangeTimes->{{3.921072755709854*^9, 3.921072775871993*^9}, {
-  3.921072821696088*^9, 3.921072855712018*^9}, {3.921145462257925*^9, 
-  3.921145775693036*^9}, {3.92114589426789*^9, 3.9211459013121977`*^9}},
- CellLabel->"In[23]:=",ExpressionUUID->"bbb062e0-ec44-46c3-b3c3-b6fb3c13d138"],
+      RowBox[{"kmub", "*", "RIM"}], "+", 
+      RowBox[{"rSplicing", "*", "immaturemRNA"}], "-", 
+      RowBox[{"mRNA", "*", "ap"}], "-", 
+      RowBox[{"mRNA", "*", "dm"}], "-", 
+      RowBox[{"kmb", "*", "RI", "*", "mRNA"}]}]}], ",", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"R", "+", "RI", "+", "RIM"}], "==", "Rtot"}]}], 
+   "}"}]}], "\[IndentingNewLine]", 
+ RowBox[{"Solve", "[", 
+  RowBox[{"riscEquations", ",", " ", 
+   RowBox[{"{", 
+    RowBox[{"miR", ",", "R", ",", "RI", ",", "RIM", ",", "mRNA"}], "}"}], ",",
+    " ", "PositiveReals"}], "]"}]}], "Input",
+ CellChangeTimes->{{3.921162836727334*^9, 3.921162844966148*^9}, {
+  3.921163053589778*^9, 3.921163176238023*^9}, {3.921163693774354*^9, 
+  3.9211637279051847`*^9}, {3.921163803681046*^9, 3.9211638259932137`*^9}, {
+  3.921169036677273*^9, 3.921169059588168*^9}, {3.921169196998522*^9, 
+  3.9211691994141073`*^9}},
+ CellLabel->"In[49]:=",ExpressionUUID->"0fd0639b-a29a-417d-bbc8-5056550426d7"],
 
 Cell[BoxData[
  RowBox[{"{", 
@@ -132,585 +176,47 @@ Cell[BoxData[
    RowBox[{"0", "\[Equal]", 
     RowBox[{
      RowBox[{
-      RowBox[{"-", "pre"}], " ", 
-      SubscriptBox["r", "dicer"]}], "+", 
-     RowBox[{"pri", " ", 
-      SubscriptBox["r", "drosha"]}]}]}], ",", 
+      RowBox[{"-", "dmi"}], " ", "miR"}], "-", 
+     RowBox[{"kmib", " ", "miR", " ", "R"}], "+", 
+     RowBox[{"pre", " ", "rDicer"}]}]}], ",", 
    RowBox[{"0", "\[Equal]", 
     RowBox[{
      RowBox[{
-      RowBox[{"-", "miRNA"}], " ", 
-      SubscriptBox["d", "mi"]}], "-", 
-     RowBox[{"miRNA", " ", "R", " ", 
-      SubscriptBox["k", "mib"]}], "+", 
-     RowBox[{"pre", " ", 
-      SubscriptBox["r", "dicer"]}]}]}], ",", 
+      RowBox[{"-", "kmib"}], " ", "miR", " ", "R"}], "+", 
+     RowBox[{"kmiub", " ", "RI"}]}]}], ",", 
+   RowBox[{"0", "\[Equal]", 
+    RowBox[{
+     RowBox[{"kmib", " ", "miR", " ", "R"}], "-", 
+     RowBox[{"kmiub", " ", "RI"}], "-", 
+     RowBox[{"kmb", " ", "mRNA", " ", "RI"}], "+", 
+     RowBox[{"kdeg", " ", "RIM"}], "+", 
+     RowBox[{"kmub", " ", "RIM"}]}]}], ",", 
+   RowBox[{"0", "\[Equal]", 
+    RowBox[{
+     RowBox[{"kmb", " ", "mRNA", " ", "RI"}], "-", 
+     RowBox[{"kdeg", " ", "RIM"}], "-", 
+     RowBox[{"kmub", " ", "RIM"}]}]}], ",", 
    RowBox[{"0", "\[Equal]", 
     RowBox[{
      RowBox[{
-      RowBox[{"-", "miRNA"}], " ", "R", " ", 
-      SubscriptBox["k", "mib"]}], "+", 
-     RowBox[{"RI", " ", 
-      SubscriptBox["k", "miub"]}]}]}], ",", 
-   RowBox[{"0", "\[Equal]", 
-    RowBox[{
-     RowBox[{"RIM", " ", 
-      SubscriptBox["k", "deg"]}], "-", 
-     RowBox[{"mRNA", " ", "RI", " ", 
-      SubscriptBox["k", "mb"]}], "+", 
-     RowBox[{"miRNA", " ", "R", " ", 
-      SubscriptBox["k", "mib"]}], "-", 
-     RowBox[{"RI", " ", 
-      SubscriptBox["k", "miub"]}], "+", 
-     RowBox[{"RIM", " ", 
-      SubscriptBox["k", "mub"]}]}]}], ",", 
-   RowBox[{"0", "\[Equal]", 
-    RowBox[{
-     RowBox[{
-      RowBox[{"-", "mRNA"}], " ", 
-      SubscriptBox["a", "p"]}], "-", 
-     RowBox[{"mRNA", " ", 
-      SubscriptBox["d", "m"]}], "-", 
-     RowBox[{"mRNA", " ", "RI", " ", 
-      SubscriptBox["k", "mb"]}], "+", 
-     RowBox[{"RIM", " ", 
-      SubscriptBox["k", "mub"]}], "+", 
-     RowBox[{
-      SubscriptBox["mRNA", "i"], " ", 
-      SubscriptBox["r", "splicing"]}]}]}], ",", 
-   RowBox[{"0", "\[Equal]", 
-    RowBox[{
-     RowBox[{
-      RowBox[{"-", "RIM"}], " ", "zeta", " ", 
-      SubscriptBox["a", "p"]}], "-", 
-     RowBox[{"RIM", " ", 
-      SubscriptBox["k", "deg"]}], "+", 
-     RowBox[{"mRNA", " ", "RI", " ", 
-      SubscriptBox["k", "mb"]}], "-", 
-     RowBox[{"RIM", " ", 
-      SubscriptBox["k", "mub"]}]}]}], ",", 
-   RowBox[{"0", "\[Equal]", 
-    RowBox[{
-     RowBox[{"mRNA", " ", 
-      SubscriptBox["a", "p"]}], "+", 
-     RowBox[{"RIM", " ", "zeta", " ", 
-      SubscriptBox["a", "p"]}], "-", 
-     RowBox[{"P", " ", 
-      SubscriptBox["d", "p"]}]}]}], ",", 
-   RowBox[{"0", "\[Equal]", 
-    RowBox[{
-     RowBox[{
-      SubscriptBox["a", "im"], " ", 
-      SubscriptBox["copy", "reg"]}], "-", 
-     RowBox[{
-      SubscriptBox["d", "im"], " ", 
-      SubscriptBox["mRNA", "i"]}], "-", 
-     RowBox[{
-      SubscriptBox["mRNA", "i"], " ", 
-      SubscriptBox["r", "splicing"]}]}]}], ",", 
-   RowBox[{"0", "\[Equal]", 
-    RowBox[{
-     RowBox[{
-      RowBox[{"-", "pri"}], " ", 
-      SubscriptBox["r", "drosha"]}], "+", 
-     RowBox[{
-      SubscriptBox["mRNA", "i"], " ", 
-      SubscriptBox["r", "splicing"]}]}]}], ",", 
-   RowBox[{"R", ">", "0"}], ",", 
-   RowBox[{"RI", ">", "0"}], ",", 
-   RowBox[{"RIM", ">", "0"}]}], "}"}]], "Output",
- CellChangeTimes->{3.921145776985647*^9, 3.921145901871263*^9, 
-  3.9211464910967903`*^9},
- CellLabel->"Out[23]=",ExpressionUUID->"c33baac6-27a5-4caa-b426-ebcff806cb3f"]
-}, Open  ]],
-
-Cell[CellGroupData[{
-
-Cell[BoxData[
- RowBox[{"Solve", "[", 
-  RowBox[{"equations", ",", " ", 
-   RowBox[{"{", 
-    RowBox[{
-    "pre", ",", " ", "miRNA", ",", "R", ",", "RI", ",", "RIM", ",", "mRNA", 
-     ",", "P", ",", 
-     SubscriptBox["mRNA", "i"], ",", "pri"}], "}"}], ",", " ", 
-   "PositiveReals"}], "]"}]], "Input",
- CellChangeTimes->{{3.921145779478859*^9, 3.921145842352891*^9}, {
-  3.921146068067811*^9, 3.921146069027631*^9}, {3.921146212710436*^9, 
-  3.921146214974392*^9}, {3.9211464859628487`*^9, 3.9211464863692636`*^9}},
- CellLabel->"In[24]:=",ExpressionUUID->"9e398418-632f-4771-b3db-6d1301e97bf3"],
-
-Cell[BoxData[
- RowBox[{"{", "}"}]], "Output",
- CellChangeTimes->{
-  3.921145843135105*^9, 3.921146064580031*^9, {3.9211462104223833`*^9, 
-   3.921146226029896*^9}, {3.921146486840706*^9, 3.921146498178101*^9}},
- CellLabel->"Out[24]=",ExpressionUUID->"0e071b8f-9797-4735-bd7b-169b39a10240"]
-}, Open  ]],
-
-Cell[CellGroupData[{
-
-Cell[BoxData[{
- RowBox[{
-  RowBox[{"preRiscEquations", "=", 
-   RowBox[{"{", "\[IndentingNewLine]", 
-    RowBox[{
-     RowBox[{"0", "==", 
-      RowBox[{
-       RowBox[{
-        RowBox[{"-", 
-         SubscriptBox["r", "splicing"]}], "*", 
-        SubscriptBox["mRNA", "i"]}], "+", 
-       RowBox[{
-        SubscriptBox["copy", "reg"], "*", 
-        SubscriptBox["a", 
-         RowBox[{"im", " "}]]}], "-", 
-       RowBox[{
-        SubscriptBox["mRNA", "i"], "*", 
-        SubscriptBox["d", "im"]}]}]}], ",", "\[IndentingNewLine]", 
-     RowBox[{"0", "==", 
-      RowBox[{
-       RowBox[{
-        RowBox[{"-", 
-         SubscriptBox["r", "drosha"]}], "*", "pri"}], "+", 
-       RowBox[{
-        SubscriptBox["r", "splicing"], "*", 
-        SubscriptBox["mRNA", "i"]}]}]}], ",", "\[IndentingNewLine]", 
-     RowBox[{"0", "==", 
-      RowBox[{
-       RowBox[{
-        RowBox[{"-", 
-         SubscriptBox["r", "dicer"]}], " ", "*", " ", "pre"}], " ", "+", " ", 
-       
-       RowBox[{
-        SubscriptBox["r", "drosha"], " ", "*", " ", "pri"}]}]}], ",", 
-     "\[IndentingNewLine]", 
-     RowBox[{"0", "==", 
-      RowBox[{
-       RowBox[{
-        SubscriptBox["r", "dicer"], "*", "pre"}], "-", 
-       RowBox[{"miRNA", "*", 
-        SubscriptBox["d", "mi"]}], "-", 
-       RowBox[{
-        SubscriptBox["k", "mib"], "*", "miRNA", "*", "R"}]}]}]}], 
-    "\[IndentingNewLine]", "}"}]}], ";"}], "\[IndentingNewLine]", 
- RowBox[{"Solve", "[", 
-  RowBox[{"preRiscEquations", ",", " ", 
-   RowBox[{"{", 
-    RowBox[{
-     SubscriptBox["mRNA", "i"], ",", "pri", ",", "pre", ",", "miRNA"}], "}"}],
-    ",", " ", "PositiveReals"}], "]"}]}], "Input",
- CellChangeTimes->{{3.9211462913729477`*^9, 3.921146382744342*^9}, {
-  3.921146436163394*^9, 3.921146447217484*^9}, {3.9211465680307217`*^9, 
-  3.9211465779141617`*^9}, {3.92114660933068*^9, 3.921146634769868*^9}},
- CellLabel->"In[31]:=",ExpressionUUID->"d6a0f022-3f39-4958-a3e2-82350c0608ef"],
-
-Cell[BoxData[
- RowBox[{"{", 
-  RowBox[{"{", 
+      RowBox[{"-", "ap"}], " ", "mRNA"}], "-", 
+     RowBox[{"dm", " ", "mRNA"}], "-", 
+     RowBox[{"kmb", " ", "mRNA", " ", "RI"}], "+", 
+     RowBox[{"kmub", " ", "RIM"}], "+", 
+     RowBox[{"immaturemRNA", " ", "rSplicing"}]}]}], ",", 
    RowBox[{
-    RowBox[{
-     SubscriptBox["mRNA", "i"], "\[Rule]", 
-     TemplateBox[{
-       FractionBox[
-        RowBox[{
-          SubscriptBox["a", "im"], " ", 
-          SubscriptBox["copy", "reg"]}], 
-        RowBox[{
-          SubscriptBox["d", "im"], "+", 
-          SubscriptBox["r", "splicing"]}]], 
-       InterpretationBox[
-        DynamicModuleBox[{Typeset`open = False}, 
-         TemplateBox[{"Expression", 
-           StyleBox[
-            TagBox[
-             TooltipBox["\"condition\"", 
-              TagBox[
-               RowBox[{
-                 RowBox[{
-                   SubscriptBox["a", "im"], ">", "0"}], "&&", 
-                 RowBox[{
-                   SubscriptBox["copy", "reg"], ">", "0"}], "&&", 
-                 RowBox[{
-                   SubscriptBox["d", "im"], ">", "0"}], "&&", 
-                 RowBox[{
-                   SubscriptBox["d", "mi"], ">", "0"}], "&&", 
-                 RowBox[{
-                   SubscriptBox["k", "mib"], ">", "0"}], "&&", 
-                 RowBox[{
-                   SubscriptBox["r", "dicer"], ">", "0"}], "&&", 
-                 RowBox[{
-                   SubscriptBox["r", "drosha"], ">", "0"}], "&&", 
-                 RowBox[{
-                   SubscriptBox["r", "splicing"], ">", "0"}], "&&", 
-                 RowBox[{"R", ">", "0"}]}], Short[#, 7]& ]], Annotation[#, 
-              Short[
-               And[
-               Subscript[$CellContext`a, $CellContext`im] > 0, 
-                Subscript[$CellContext`copy, $CellContext`reg] > 0, 
-                Subscript[$CellContext`d, $CellContext`im] > 0, 
-                Subscript[$CellContext`d, $CellContext`mi] > 0, 
-                Subscript[$CellContext`k, $CellContext`mib] > 0, 
-                Subscript[$CellContext`r, $CellContext`dicer] > 0, 
-                Subscript[$CellContext`r, $CellContext`drosha] > 0, 
-                Subscript[$CellContext`r, $CellContext`splicing] > 
-                0, $CellContext`R > 0], 7], "Tooltip"]& ], 
-            "IconizedCustomName", StripOnInput -> False], 
-           GridBox[{{
-              RowBox[{
-                TagBox["\"Head: \"", "IconizedLabel"], "\[InvisibleSpace]", 
-                TagBox["And", "IconizedItem"]}]}, {
-              RowBox[{
-                TagBox["\"Byte count: \"", "IconizedLabel"], 
-                "\[InvisibleSpace]", 
-                TagBox["1208", "IconizedItem"]}]}}, 
-            GridBoxAlignment -> {"Columns" -> {{Left}}}, DefaultBaseStyle -> 
-            "Column", 
-            GridBoxItemSize -> {
-             "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}], 
-           Dynamic[Typeset`open]}, "IconizedObject"]], 
-        And[
-        Subscript[$CellContext`a, $CellContext`im] > 0, 
-         Subscript[$CellContext`copy, $CellContext`reg] > 0, 
-         Subscript[$CellContext`d, $CellContext`im] > 0, 
-         Subscript[$CellContext`d, $CellContext`mi] > 0, 
-         Subscript[$CellContext`k, $CellContext`mib] > 0, 
-         Subscript[$CellContext`r, $CellContext`dicer] > 0, 
-         Subscript[$CellContext`r, $CellContext`drosha] > 0, 
-         Subscript[$CellContext`r, $CellContext`splicing] > 0, $CellContext`R > 
-         0], SelectWithContents -> True, Selectable -> False]},
-      "ConditionalExpression"]}], ",", 
-    RowBox[{"pri", "\[Rule]", 
-     TemplateBox[{
-       FractionBox[
-        RowBox[{
-          SubscriptBox["a", "im"], " ", 
-          SubscriptBox["copy", "reg"], " ", 
-          SubscriptBox["r", "splicing"]}], 
-        RowBox[{
-          SubscriptBox["r", "drosha"], " ", 
-          RowBox[{"(", 
-            RowBox[{
-              SubscriptBox["d", "im"], "+", 
-              SubscriptBox["r", "splicing"]}], ")"}]}]], 
-       InterpretationBox[
-        DynamicModuleBox[{Typeset`open = False}, 
-         TemplateBox[{"Expression", 
-           StyleBox[
-            TagBox[
-             TooltipBox["\"condition\"", 
-              TagBox[
-               RowBox[{
-                 RowBox[{
-                   SubscriptBox["a", "im"], ">", "0"}], "&&", 
-                 RowBox[{
-                   SubscriptBox["copy", "reg"], ">", "0"}], "&&", 
-                 RowBox[{
-                   SubscriptBox["d", "im"], ">", "0"}], "&&", 
-                 RowBox[{
-                   SubscriptBox["d", "mi"], ">", "0"}], "&&", 
-                 RowBox[{
-                   SubscriptBox["k", "mib"], ">", "0"}], "&&", 
-                 RowBox[{
-                   SubscriptBox["r", "dicer"], ">", "0"}], "&&", 
-                 RowBox[{
-                   SubscriptBox["r", "drosha"], ">", "0"}], "&&", 
-                 RowBox[{
-                   SubscriptBox["r", "splicing"], ">", "0"}], "&&", 
-                 RowBox[{"R", ">", "0"}]}], Short[#, 7]& ]], Annotation[#, 
-              Short[
-               And[
-               Subscript[$CellContext`a, $CellContext`im] > 0, 
-                Subscript[$CellContext`copy, $CellContext`reg] > 0, 
-                Subscript[$CellContext`d, $CellContext`im] > 0, 
-                Subscript[$CellContext`d, $CellContext`mi] > 0, 
-                Subscript[$CellContext`k, $CellContext`mib] > 0, 
-                Subscript[$CellContext`r, $CellContext`dicer] > 0, 
-                Subscript[$CellContext`r, $CellContext`drosha] > 0, 
-                Subscript[$CellContext`r, $CellContext`splicing] > 
-                0, $CellContext`R > 0], 7], "Tooltip"]& ], 
-            "IconizedCustomName", StripOnInput -> False], 
-           GridBox[{{
-              RowBox[{
-                TagBox["\"Head: \"", "IconizedLabel"], "\[InvisibleSpace]", 
-                TagBox["And", "IconizedItem"]}]}, {
-              RowBox[{
-                TagBox["\"Byte count: \"", "IconizedLabel"], 
-                "\[InvisibleSpace]", 
-                TagBox["1208", "IconizedItem"]}]}}, 
-            GridBoxAlignment -> {"Columns" -> {{Left}}}, DefaultBaseStyle -> 
-            "Column", 
-            GridBoxItemSize -> {
-             "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}], 
-           Dynamic[Typeset`open]}, "IconizedObject"]], 
-        And[
-        Subscript[$CellContext`a, $CellContext`im] > 0, 
-         Subscript[$CellContext`copy, $CellContext`reg] > 0, 
-         Subscript[$CellContext`d, $CellContext`im] > 0, 
-         Subscript[$CellContext`d, $CellContext`mi] > 0, 
-         Subscript[$CellContext`k, $CellContext`mib] > 0, 
-         Subscript[$CellContext`r, $CellContext`dicer] > 0, 
-         Subscript[$CellContext`r, $CellContext`drosha] > 0, 
-         Subscript[$CellContext`r, $CellContext`splicing] > 0, $CellContext`R > 
-         0], SelectWithContents -> True, Selectable -> False]},
-      "ConditionalExpression"]}], ",", 
-    RowBox[{"pre", "\[Rule]", 
-     TemplateBox[{
-       FractionBox[
-        RowBox[{
-          SubscriptBox["a", "im"], " ", 
-          SubscriptBox["copy", "reg"], " ", 
-          SubscriptBox["r", "splicing"]}], 
-        RowBox[{
-          SubscriptBox["r", "dicer"], " ", 
-          RowBox[{"(", 
-            RowBox[{
-              SubscriptBox["d", "im"], "+", 
-              SubscriptBox["r", "splicing"]}], ")"}]}]], 
-       InterpretationBox[
-        DynamicModuleBox[{Typeset`open = False}, 
-         TemplateBox[{"Expression", 
-           StyleBox[
-            TagBox[
-             TooltipBox["\"condition\"", 
-              TagBox[
-               RowBox[{
-                 RowBox[{
-                   SubscriptBox["a", "im"], ">", "0"}], "&&", 
-                 RowBox[{
-                   SubscriptBox["copy", "reg"], ">", "0"}], "&&", 
-                 RowBox[{
-                   SubscriptBox["d", "im"], ">", "0"}], "&&", 
-                 RowBox[{
-                   SubscriptBox["d", "mi"], ">", "0"}], "&&", 
-                 RowBox[{
-                   SubscriptBox["k", "mib"], ">", "0"}], "&&", 
-                 RowBox[{
-                   SubscriptBox["r", "dicer"], ">", "0"}], "&&", 
-                 RowBox[{
-                   SubscriptBox["r", "drosha"], ">", "0"}], "&&", 
-                 RowBox[{
-                   SubscriptBox["r", "splicing"], ">", "0"}], "&&", 
-                 RowBox[{"R", ">", "0"}]}], Short[#, 7]& ]], Annotation[#, 
-              Short[
-               And[
-               Subscript[$CellContext`a, $CellContext`im] > 0, 
-                Subscript[$CellContext`copy, $CellContext`reg] > 0, 
-                Subscript[$CellContext`d, $CellContext`im] > 0, 
-                Subscript[$CellContext`d, $CellContext`mi] > 0, 
-                Subscript[$CellContext`k, $CellContext`mib] > 0, 
-                Subscript[$CellContext`r, $CellContext`dicer] > 0, 
-                Subscript[$CellContext`r, $CellContext`drosha] > 0, 
-                Subscript[$CellContext`r, $CellContext`splicing] > 
-                0, $CellContext`R > 0], 7], "Tooltip"]& ], 
-            "IconizedCustomName", StripOnInput -> False], 
-           GridBox[{{
-              RowBox[{
-                TagBox["\"Head: \"", "IconizedLabel"], "\[InvisibleSpace]", 
-                TagBox["And", "IconizedItem"]}]}, {
-              RowBox[{
-                TagBox["\"Byte count: \"", "IconizedLabel"], 
-                "\[InvisibleSpace]", 
-                TagBox["1208", "IconizedItem"]}]}}, 
-            GridBoxAlignment -> {"Columns" -> {{Left}}}, DefaultBaseStyle -> 
-            "Column", 
-            GridBoxItemSize -> {
-             "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}], 
-           Dynamic[Typeset`open]}, "IconizedObject"]], 
-        And[
-        Subscript[$CellContext`a, $CellContext`im] > 0, 
-         Subscript[$CellContext`copy, $CellContext`reg] > 0, 
-         Subscript[$CellContext`d, $CellContext`im] > 0, 
-         Subscript[$CellContext`d, $CellContext`mi] > 0, 
-         Subscript[$CellContext`k, $CellContext`mib] > 0, 
-         Subscript[$CellContext`r, $CellContext`dicer] > 0, 
-         Subscript[$CellContext`r, $CellContext`drosha] > 0, 
-         Subscript[$CellContext`r, $CellContext`splicing] > 0, $CellContext`R > 
-         0], SelectWithContents -> True, Selectable -> False]},
-      "ConditionalExpression"]}], ",", 
-    RowBox[{"miRNA", "\[Rule]", 
-     TemplateBox[{
-       FractionBox[
-        RowBox[{
-          SubscriptBox["a", "im"], " ", 
-          SubscriptBox["copy", "reg"], " ", 
-          SubscriptBox["r", "splicing"]}], 
-        RowBox[{
-          RowBox[{"(", 
-            RowBox[{
-              SubscriptBox["d", "mi"], "+", 
-              RowBox[{"R", " ", 
-                SubscriptBox["k", "mib"]}]}], ")"}], " ", 
-          RowBox[{"(", 
-            RowBox[{
-              SubscriptBox["d", "im"], "+", 
-              SubscriptBox["r", "splicing"]}], ")"}]}]], 
-       InterpretationBox[
-        DynamicModuleBox[{Typeset`open = False}, 
-         TemplateBox[{"Expression", 
-           StyleBox[
-            TagBox[
-             TooltipBox["\"condition\"", 
-              TagBox[
-               RowBox[{
-                 RowBox[{
-                   SubscriptBox["a", "im"], ">", "0"}], "&&", 
-                 RowBox[{
-                   SubscriptBox["copy", "reg"], ">", "0"}], "&&", 
-                 RowBox[{
-                   SubscriptBox["d", "im"], ">", "0"}], "&&", 
-                 RowBox[{
-                   SubscriptBox["d", "mi"], ">", "0"}], "&&", 
-                 RowBox[{
-                   SubscriptBox["k", "mib"], ">", "0"}], "&&", 
-                 RowBox[{
-                   SubscriptBox["r", "dicer"], ">", "0"}], "&&", 
-                 RowBox[{
-                   SubscriptBox["r", "drosha"], ">", "0"}], "&&", 
-                 RowBox[{
-                   SubscriptBox["r", "splicing"], ">", "0"}], "&&", 
-                 RowBox[{"R", ">", "0"}]}], Short[#, 7]& ]], Annotation[#, 
-              Short[
-               And[
-               Subscript[$CellContext`a, $CellContext`im] > 0, 
-                Subscript[$CellContext`copy, $CellContext`reg] > 0, 
-                Subscript[$CellContext`d, $CellContext`im] > 0, 
-                Subscript[$CellContext`d, $CellContext`mi] > 0, 
-                Subscript[$CellContext`k, $CellContext`mib] > 0, 
-                Subscript[$CellContext`r, $CellContext`dicer] > 0, 
-                Subscript[$CellContext`r, $CellContext`drosha] > 0, 
-                Subscript[$CellContext`r, $CellContext`splicing] > 
-                0, $CellContext`R > 0], 7], "Tooltip"]& ], 
-            "IconizedCustomName", StripOnInput -> False], 
-           GridBox[{{
-              RowBox[{
-                TagBox["\"Head: \"", "IconizedLabel"], "\[InvisibleSpace]", 
-                TagBox["And", "IconizedItem"]}]}, {
-              RowBox[{
-                TagBox["\"Byte count: \"", "IconizedLabel"], 
-                "\[InvisibleSpace]", 
-                TagBox["1208", "IconizedItem"]}]}}, 
-            GridBoxAlignment -> {"Columns" -> {{Left}}}, DefaultBaseStyle -> 
-            "Column", 
-            GridBoxItemSize -> {
-             "Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}], 
-           Dynamic[Typeset`open]}, "IconizedObject"]], 
-        And[
-        Subscript[$CellContext`a, $CellContext`im] > 0, 
-         Subscript[$CellContext`copy, $CellContext`reg] > 0, 
-         Subscript[$CellContext`d, $CellContext`im] > 0, 
-         Subscript[$CellContext`d, $CellContext`mi] > 0, 
-         Subscript[$CellContext`k, $CellContext`mib] > 0, 
-         Subscript[$CellContext`r, $CellContext`dicer] > 0, 
-         Subscript[$CellContext`r, $CellContext`drosha] > 0, 
-         Subscript[$CellContext`r, $CellContext`splicing] > 0, $CellContext`R > 
-         0], SelectWithContents -> True, Selectable -> False]},
-      "ConditionalExpression"]}]}], "}"}], "}"}]], "Output",
- CellChangeTimes->{{3.921146317728902*^9, 3.921146330846792*^9}, {
-   3.921146363520295*^9, 3.92114638315758*^9}, 3.921146447797773*^9, 
-   3.9211465785361443`*^9, {3.921146610996067*^9, 3.921146635724403*^9}},
- CellLabel->"Out[32]=",ExpressionUUID->"c1e8a566-1e29-48a3-9d0a-d89092638b21"]
-}, Open  ]],
-
-Cell[CellGroupData[{
-
-Cell[BoxData[{
- RowBox[{
-  RowBox[{"withRiscEquations", "=", 
-   RowBox[{"{", "\[IndentingNewLine]", 
-    RowBox[{
-     RowBox[{"0", "==", 
-      RowBox[{
-       RowBox[{
-        RowBox[{"-", 
-         SubscriptBox["r", "splicing"]}], "*", 
-        SubscriptBox["mRNA", "i"]}], "+", 
-       RowBox[{
-        SubscriptBox["copy", "reg"], "*", 
-        SubscriptBox["a", 
-         RowBox[{"im", " "}]]}], "-", 
-       RowBox[{
-        SubscriptBox["mRNA", "i"], "*", 
-        SubscriptBox["d", "im"]}]}]}], ",", "\[IndentingNewLine]", 
-     RowBox[{"0", "==", 
-      RowBox[{
-       RowBox[{
-        RowBox[{"-", 
-         SubscriptBox["r", "drosha"]}], "*", "pri"}], "+", 
-       RowBox[{
-        SubscriptBox["r", "splicing"], "*", 
-        SubscriptBox["mRNA", "i"]}]}]}], ",", "\[IndentingNewLine]", 
-     RowBox[{"0", "==", 
-      RowBox[{
-       RowBox[{
-        RowBox[{"-", 
-         SubscriptBox["r", "dicer"]}], " ", "*", " ", "pre"}], " ", "+", " ", 
-       
-       RowBox[{
-        SubscriptBox["r", "drosha"], " ", "*", " ", "pri"}]}]}], ",", 
-     "\[IndentingNewLine]", 
-     RowBox[{"0", "==", 
-      RowBox[{
-       RowBox[{
-        SubscriptBox["r", "dicer"], "*", "pre"}], "-", 
-       RowBox[{"miRNA", "*", 
-        SubscriptBox["d", "mi"]}], "-", 
-       RowBox[{
-        SubscriptBox["k", "mib"], "*", "miRNA", "*", "R"}]}]}], ",", 
-     "\[IndentingNewLine]", 
-     RowBox[{"0", "==", 
-      RowBox[{
-       RowBox[{
-        SubscriptBox["k", "miub"], "*", "RI"}], "-", 
-       RowBox[{
-        SubscriptBox["k", "mib"], "*", "miRNA", "*", "R"}]}]}], ",", 
-     "\[IndentingNewLine]", 
-     RowBox[{"0", "==", 
-      RowBox[{
-       RowBox[{
-        SubscriptBox["k", "deg"], "*", "RIM"}], "+", 
-       RowBox[{
-        SubscriptBox["k", "mub"], "*", "RIM"}], "-", 
-       RowBox[{
-        SubscriptBox["k", "miub"], "*", "RI"}], "-", 
-       RowBox[{
-        SubscriptBox["k", "mb"], "*", "RI", "*", "mRNA"}], "+", 
-       RowBox[{
-        SubscriptBox["k", "mib"], "*", "miRNA", "*", "R"}]}]}], ",", 
-     "\[IndentingNewLine]", 
-     RowBox[{"0", "==", 
-      RowBox[{
-       RowBox[{
-        RowBox[{"-", 
-         SubscriptBox["k", "deg"]}], "*", "RIM"}], "-", 
-       RowBox[{
-        SubscriptBox["k", "mub"], "*", "RIM"}], "+", 
-       RowBox[{
-        SubscriptBox["k", "mb"], "*", "RI", "*", "mRNA"}], "-", 
-       RowBox[{"RIM", "*", 
-        SubscriptBox["a", "p"], "*", "zeta"}]}]}]}], "\[IndentingNewLine]", 
-    "}"}]}], ";"}], "\[IndentingNewLine]", 
- RowBox[{"Solve", "[", 
-  RowBox[{"withRiscEquations", ",", " ", 
-   RowBox[{"{", 
-    RowBox[{
-     SubscriptBox["mRNA", "i"], ",", "pri", ",", "pre", ",", "miRNA", ",", 
-     " ", "R", ",", " ", "RI", ",", " ", "RIM"}], "}"}], ",", 
-   "PositiveReals"}], "]"}]}], "Input",
- CellChangeTimes->{{3.921146907245442*^9, 3.9211470126097383`*^9}, {
-  3.921147110361103*^9, 3.921147126672923*^9}},
- CellLabel->"In[45]:=",ExpressionUUID->"7d4e0c00-a499-4835-a4aa-0d404658db24"],
-
-Cell[BoxData[
- RowBox[{"{", "}"}]], "Output",
- CellChangeTimes->{
-  3.921146917601297*^9, 3.921146947635013*^9, {3.9211469941374273`*^9, 
-   3.921147006317297*^9}, {3.921147110977763*^9, 3.9211471285621843`*^9}},
- CellLabel->"Out[46]=",ExpressionUUID->"1253ac6f-c453-4fa8-bec8-aa912311408c"]
+    RowBox[{"R", "+", "RI", "+", "RIM"}], "\[Equal]", "Rtot"}]}], 
+  "}"}]], "Output",
+ CellChangeTimes->{{3.921163160078854*^9, 3.921163176805135*^9}, {
+   3.9211636950652103`*^9, 3.921163728188764*^9}, {3.921163807872362*^9, 
+   3.921163826535859*^9}, {3.9211690392279778`*^9, 3.921169060624914*^9}, 
+   3.921169199829114*^9},
+ CellLabel->"Out[49]=",ExpressionUUID->"5d51a945-00dd-4c0e-8de2-55e88ae07828"]
+}, Open  ]]
 }, Open  ]]
 },
 WindowSize->{1905, 1032},
-WindowMargins->{{-1920, 1455}, {48, Automatic}},
+WindowMargins->{{Automatic, 1455}, {48, Automatic}},
 FrontEndVersion->"14.0 for Linux x86 (64-bit) (December 12, 2023)",
 StyleDefinitions->"Default.nb",
 ExpressionUUID->"8379eba0-80bd-4a4a-9f00-70ce37a2d9d7"
@@ -727,20 +233,19 @@ CellTagsIndex->{}
 (*NotebookFileOutline
 Notebook[{
 Cell[CellGroupData[{
-Cell[580, 22, 3525, 104, 242, "Input",ExpressionUUID->"bbb062e0-ec44-46c3-b3c3-b6fb3c13d138"],
-Cell[4108, 128, 3033, 95, 143, "Output",ExpressionUUID->"c33baac6-27a5-4caa-b426-ebcff806cb3f"]
+Cell[580, 22, 201, 3, 67, "Section",ExpressionUUID->"337ceaa0-3b9b-4dea-8e61-f6e8fa82ddd7"],
+Cell[CellGroupData[{
+Cell[806, 29, 1772, 46, 136, "Input",ExpressionUUID->"93046a10-9fa9-4a37-b6b0-f08c16330dfc"],
+Cell[2581, 77, 858, 21, 58, "Output",ExpressionUUID->"8ab4246a-faf3-420c-ace3-de528f6777e7"],
+Cell[3442, 100, 396, 8, 35, "Output",ExpressionUUID->"b7fcdd27-6615-4b5c-8334-e305ed346c66"]
+}, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[7178, 228, 595, 12, 31, "Input",ExpressionUUID->"9e398418-632f-4771-b3db-6d1301e97bf3"],
-Cell[7776, 242, 289, 5, 33, "Output",ExpressionUUID->"0e071b8f-9797-4735-bd7b-169b39a10240"]
-}, Open  ]],
+Cell[3887, 114, 177, 3, 67, "Section",ExpressionUUID->"03e64a28-2504-4439-9027-60d72a65007c"],
 Cell[CellGroupData[{
-Cell[8102, 252, 1934, 53, 161, "Input",ExpressionUUID->"d6a0f022-3f39-4958-a3e2-82350c0608ef"],
-Cell[10039, 307, 13949, 304, 72, "Output",ExpressionUUID->"c1e8a566-1e29-48a3-9d0a-d89092638b21"]
-}, Open  ]],
-Cell[CellGroupData[{
-Cell[24025, 616, 2958, 85, 222, "Input",ExpressionUUID->"7d4e0c00-a499-4835-a4aa-0d404658db24"],
-Cell[26986, 703, 291, 5, 55, "Output",ExpressionUUID->"1253ac6f-c453-4fa8-bec8-aa912311408c"]
+Cell[4089, 121, 2000, 49, 172, "Input",ExpressionUUID->"0fd0639b-a29a-417d-bbc8-5056550426d7"],
+Cell[6092, 172, 1569, 41, 35, "Output",ExpressionUUID->"5d51a945-00dd-4c0e-8de2-55e88ae07828"]
+}, Open  ]]
 }, Open  ]]
 }
 ]

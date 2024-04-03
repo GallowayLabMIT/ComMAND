@@ -41,7 +41,7 @@ regulated_gene_rn = @reaction_network regulated_gene_dynamics begin
     end
     # Production of protein
     α_p, regulated_mRNA --> protein
-    α_p * ζ, risc_miRNA_mRNA --> protein
+    α_p * ζ, risc_miRNA_mRNA --> protein + risc_miRNA_mRNA
     # Degradation of products
     δ_m, regulated_mRNA --> ∅
     δ_p, protein --> ∅

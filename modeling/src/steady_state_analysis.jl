@@ -6,10 +6,12 @@ using Latexify
 outdir = "$(@__DIR__)/../../output/modeling/latex"
 mkpath(outdir)
 
+variable_replacements
+
 single_transcript_iFFL
 open("$(outdir)/single_transcript_odes.tex", "w") do file
     ode_system_latex = latexify(convert(ODESystem, single_transcript_iFFL))
-    write(file, replace(ode_system_latex,
+    mapped = replace(ode_system_latex,
        raw"\mathrm{pre}_{miRNA}\left( t \right)" => raw"\text{pre}(t)",
        raw"\mathrm{d} \mathrm{miRNA}\left( t \right)" => raw"\text{miR}(t)",
        raw"\mathrm{risc}\left( t \right)" => raw"\text{R}(t)",
@@ -19,7 +21,14 @@ open("$(outdir)/single_transcript_odes.tex", "w") do file
        raw"\mathrm{protein}\left( t \right)" => raw"P(t)",
        raw"\mathrm{immature}_{mRNA}\left( t \right)" => raw"\text{mRNA}_i(t)",
        raw"\mathrm{pri}_{miRNA}\left( t \right)" => raw"\text{pri}(t)",
+       raw"{dicer}" => raw"\text{dicer}",
+       raw"{drosha}" => raw"\text{drosha}",
+       raw"{splicing}" => raw"\text{splicing}",
+       raw"regulated_{copy}" => raw"c_\text{regulated}",
+       "miRNA" => "miR",
        "unbind" => "ub",
        "bind" => "b",
-    ))
+    )
+    reordered = getindex(split(mapped, "\n"), [1, 9, 10, 2, 3, 4, 5, 7, 6, 8, 11])
+    write(file, join(reordered, "\n"))
 end
