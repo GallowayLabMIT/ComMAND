@@ -40,7 +40,7 @@ regulated_gene_rn = @reaction_network regulated_gene_dynamics begin
         ζ=0.0       # Translation efficiency for RISC complex [unitless], Range: 0 to 1
     end
     # Production of protein
-    α_p, regulated_mRNA --> protein
+    α_p, regulated_mRNA --> protein + regulated_mRNA
     α_p * ζ, risc_miRNA_mRNA --> protein + risc_miRNA_mRNA
     # Degradation of products
     δ_m, regulated_mRNA --> ∅
@@ -99,7 +99,7 @@ intronic_unregulated_gene_rn = @reaction_network intronic_unregulated_expression
     # Transcription
     α_im * unregulated_copy, ∅ --> immature_mRNA
     # Protein production
-    α_p, unregulated_mRNA --> protein2
+    α_p, unregulated_mRNA --> protein2 + unregulated_mRNA
     # Degradation of products
     δ_im, immature_mRNA --> ∅
     δ_m, unregulated_mRNA --> ∅
@@ -199,9 +199,9 @@ double_iFFL_rn = @reaction_network double_transcript_iFFL begin
     δ_p1, protein1 --> ∅
     δ_p2, protein2 --> ∅
     # Production of protein
-    α_p1, mRNA1 --> protein1
-    α_p2, mRNA2 --> protein2
-    α_p1 * ζ, risc_miRNA_mRNA --> protein1
+    α_p1, mRNA1 --> mRNA1 + protein1
+    α_p2, mRNA2 --> mRNA2 + protein2
+    α_p1 * ζ, risc_miRNA_mRNA --> risc_miRNA_mRNA + protein1
     # Splicing
     r_splicing, immature_mRNA2 --> mRNA2 + pri_miRNA
     # miRNA processing
@@ -241,7 +241,7 @@ U6_iFFL_rn = @reaction_network double_transcript_U6_iFFL begin
     δ_p, protein --> ∅
     # Production of protein
     α_p, mRNA --> protein
-    α_p * ζ, risc_miRNA_mRNA --> protein
+    α_p * ζ, risc_miRNA_mRNA --> risc_miRNA_mRNA + protein
     # miRNA processing
     r_dicer, pre_miRNA --> miRNA # dicer
     # Knockdown
