@@ -59,10 +59,10 @@ end
 # Production of a regulated gene transcript, without an internal intron
 nonintronic_regulated_gene_rn = @reaction_network gene_ts_expression begin
     @parameters begin
-        α_im=4.67e-2     # Transcription rate constant [1/s]
+        α_m=4.67e-2     # Transcription rate constant [1/s]
         regulated_copy=1 # Number of copies of the regulated gene
     end
-    α_im * regulated_copy, ∅ --> regulated_mRNA
+    α_m * regulated_copy, ∅ --> regulated_mRNA
 end
 
 # Production of an regulated transcript with its own miRNA intron
@@ -150,8 +150,8 @@ single_iFFL_rn = @reaction_network single_transcript_iFFL begin
     δ_mi, miRNA --> ∅
     δ_p, protein --> ∅
     # Production of protein
-    α_p, mRNA --> protein
-    α_p * ζ, risc_miRNA_mRNA --> protein
+    α_p, mRNA --> protein + mRNA
+    α_p * ζ, risc_miRNA_mRNA --> protein + risc_miRNA_mRNA
     # Splicing
     r_splicing, immature_mRNA --> mRNA + pri_miRNA
     # miRNA processing
