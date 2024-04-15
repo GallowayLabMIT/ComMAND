@@ -36,7 +36,7 @@ function find_R_vals(params)
     ]
     d, c, b, a = (coeffs[1], coeffs[2], coeffs[3], coeffs[4])
     discriminant = b * b * c * c - 4 * a * c * c * c - 4 * b * b * b * d - 27 * a * a * b * b + 18 * a * b * c * d
-    println("discriminant: ", discriminant)
+    @assert discriminant > 0.0
     roots = PolynomialRoots.roots(coeffs)
     # Return all positive real roots
     return map(real, filter(x->imag(x)==0.0 && real(x) > 0, roots))
@@ -58,10 +58,3 @@ plot!(ax, 1:200, calculate_mRNA.(1:200), xlabel="Copy number", ylabel="Steady st
 hidespines!(ax, :r)
 hidespines!(ax, :t)
 f
-
-"""
-\text{RIM} = \frac{k_{mRNA\_b} k_{miR\_b} r_\text{dicer} \cdot \text{pre} \cdot \text{R}}{\delta_m \delta_{mi} k_{miR\_ub} (k_\text{deg} +
-
-k_{mRNA\_ub}) + k_{miR\_b} (\delta_m k_\text{deg} k_{miR\_ub} + \delta_m k_{miR\_ub} k_{mRNA\_ub} + k_\text{deg} k_{mRNA\_m} r_\text{dicer} \cdot \text{pre}) R}
-# NOTE: update the latex from k_{mRNA\_m} to k_{mRNA\_bind}
-"""
