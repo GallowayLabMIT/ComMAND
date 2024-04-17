@@ -27,6 +27,7 @@ group_palette = {
     'miR': colors['pink'],          # miR only
     'ts3': colors['purple'],        # TS only, in 3'UTR
     'ts5': colors['purple'],        # TS only, in 5'UTR
+    'dual': colors['green'],        # part of dual-transcript vector
 }
 
 group_markers = {
@@ -37,6 +38,7 @@ group_markers = {
     'miR': 'P',
     'ts3': '^',        
     'ts5': 'v',
+    'dual': 's'
 }
 
 def get_metadata(path):
@@ -48,6 +50,7 @@ def get_metadata(path):
     metadata.loc[(metadata['group']=='controller') & (metadata['design']==3), 'color'] = colors['red']
     metadata.loc[(metadata['ts_kind']=='NT'), 'color'] = colors['gray']
     metadata.loc[(metadata['ts_num']==4), 'color'] = metadata.loc[(metadata['ts_num']==4), 'color'].apply(get_light_color)
+    metadata.loc[(metadata['group']=='miR') & (metadata['miR_loc']=='UTR'), 'color'] = metadata.loc[(metadata['group']=='miR') & (metadata['miR_loc']=='UTR'), 'color'].apply(get_light_color)
 
     # Apply marker styles
     metadata['markers'] = metadata['group'].replace(group_markers)
