@@ -94,12 +94,12 @@ end
 begin
 f = Figure()
 ax = Axis(f[1,1], xlabel="Copy number", ylabel="Steady state protein", title="Sweep of ζ")
-ylims!(ax, 400, 5000)
-xlims!(ax, 0, 200)
+ylims!(ax, 400, 7000)
+xlims!(ax, 1, 250)
 for (idx, ζ) ∈ enumerate(0:0.1:1.0)
-    lines!(ax, 1:200, calculate_protein.(
+    lines!(ax, 1:250, calculate_protein.(
         170000,
-        1:200,
+        1:250,
         ζ,
         param_dict[:k_mRNA_bind],
         param_dict[:k_mRNA_unbind]
@@ -110,6 +110,30 @@ hidespines!(ax, :r)
 hidespines!(ax, :t)
 axislegend(ax, position=:rb)
 save("$outdir/zeta_sweep.pdf", f)
+save("$outdir/zeta_sweep.svg", f)
+f
+end
+
+begin
+f = Figure()
+ax = Axis(f[1,1], xlabel="Copy number", ylabel="Steady state protein", title="Sweep of ζ", xscale=log10, yscale=log10)
+ylims!(ax, 400, 10000)
+xlims!(ax, 1, 500)
+for (idx, ζ) ∈ enumerate(0:0.1:1.0)
+    lines!(ax, 1:500, calculate_protein.(
+        170000,
+        1:500,
+        ζ,
+        param_dict[:k_mRNA_bind],
+        param_dict[:k_mRNA_unbind]
+    ), label="ζ=$(@sprintf("%.1f", ζ))",
+    color = idx, colormap = :viridis, colorrange = (1, 12))
+end
+hidespines!(ax, :r)
+hidespines!(ax, :t)
+axislegend(ax, position=:rb)
+save("$outdir/zeta_sweep_log.pdf", f)
+save("$outdir/zeta_sweep_log.svg", f)
 f
 end
 
