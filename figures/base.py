@@ -35,6 +35,7 @@ group_palette = {
     'miR': colors['pink'],          # miR only
     'ts3': colors['purple'],        # TS only, in 3'UTR
     'ts5': colors['purple'],        # TS only, in 5'UTR
+    'dual': colors['green'],        # part of dual-transcript vector
 }
 
 group_markers = {
@@ -45,6 +46,7 @@ group_markers = {
     'miR': 'P',
     'ts3': '^',        
     'ts5': 'v',
+    'dual': 's'
 }
 
 def get_metadata(path):
