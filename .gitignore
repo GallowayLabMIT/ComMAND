@@ -1,5 +1,6 @@
 datadir.txt
 output/
+modeling/src/jl_output/
 .DS_Store
 
 .vscode/
