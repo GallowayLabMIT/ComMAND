@@ -12,12 +12,15 @@ import pandas as pd
 import seaborn as sns
 
 colors = {
-    'red': 'crimson', 'orange': 'darkorange', 'yellow': '#ccb804', 'green': 'olive', 'teal': 'teal',
-    'blue': '#1650a1', 'purple': 'purple', 'pink': 'hotpink', 'black': 'black', 'gray': 'grey',
+    'red': 'crimson', 'orange': 'darkorange', 'yellow': '#ccb804', 'green': '#78AF56', 'teal': 'teal',
+    'blue': '#1650a1', 'purple': '#7A1378', 'pink': 'hotpink', 'black': 'black', 'gray': 'grey',
 }
 
 def get_light_color(color):
     return sns.light_palette(color, 3)[1]
+
+def get_dark_color(color):
+    return sns.dark_palette(color, 3)[1]
 
 group_palette = {
     'un': colors['black'],          # untransfected / uninfected
