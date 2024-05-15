@@ -9,6 +9,7 @@ notebooks that are used to render each figure.
 import matplotlib.pyplot as plt
 import rushd as rd
 import pandas as pd
+import scipy as sp
 import seaborn as sns
 
 # Sizes are relevant for paper-size figures
@@ -20,12 +21,15 @@ font_sizes = {
 }
 
 colors = {
-    'red': 'crimson', 'orange': 'darkorange', 'yellow': '#ccb804', 'green': 'olive', 'teal': 'teal',
-    'blue': '#1650a1', 'purple': 'purple', 'pink': 'hotpink', 'black': 'black', 'gray': 'grey',
+    'red': 'crimson', 'orange': 'darkorange', 'yellow': '#ccb804', 'green': '#78AF56', 'teal': 'teal',
+    'blue': '#1650a1', 'purple': '#7A1378', 'pink': 'hotpink', 'black': 'black', 'gray': 'grey',
 }
 
 def get_light_color(color):
     return sns.light_palette(color, 3)[1]
+
+def get_dark_color(color):
+    return sns.dark_palette(color, 3)[1]
 
 group_palette = {
     'un': colors['black'],          # untransfected / uninfected
@@ -58,6 +62,7 @@ def get_metadata(path):
     metadata.loc[(metadata['group']=='controller') & (metadata['design']==3), 'color'] = colors['red']
     metadata.loc[(metadata['ts_kind']=='NT'), 'color'] = colors['gray']
     metadata.loc[(metadata['ts_num']==4), 'color'] = metadata.loc[(metadata['ts_num']==4), 'color'].apply(get_light_color)
+    metadata.loc[(metadata['group']=='miR') & (metadata['miR_loc']=='UTR'), 'color'] = metadata.loc[(metadata['group']=='miR') & (metadata['miR_loc']=='UTR'), 'color'].apply(get_light_color)
 
     # Apply marker styles
     metadata['markers'] = metadata['group'].replace(group_markers)
@@ -65,6 +70,22 @@ def get_metadata(path):
 
     return metadata
 
+def gate_data(df, gates):
+    df = df.copy()
+    exp = df['exp'].values[0] # the same for entire df, assuming df = data.groupby('exp')
+    gates_dict = gates.set_index('exp').to_dict('dict') # format: column -> {index: value}
+    marker = gates_dict['marker'][exp]
+    df['expressing'] = df[marker] > gates_dict[marker][exp]
+    df['marker'] = df[marker]
+    df['output'] = df[gates_dict['output'][exp]]
+    return df
+
 def rename_multilevel_cols(index):
     if index[1] == '': return index[0]
     else: return index[0] + '_' + index[1]
+
+def get_slope(df):
+    slope, intercept, r_value, p_value, stderr = sp.stats.linregress(df['bin_marker_quantiles_median_log'], df['output_gmean_log'])
+    result = pd.DataFrame(columns=['slope', 'intercept_log', 'r_value', 'p_value', 'stderr'])
+    result.loc[len(result.index)] = [slope, intercept, r_value, p_value, stderr]
+    return result
