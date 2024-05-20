@@ -9,6 +9,7 @@ notebooks that are used to render each figure.
 import matplotlib.pyplot as plt
 import rushd as rd
 import pandas as pd
+import scipy as sp
 import seaborn as sns
 
 colors = {
@@ -74,3 +75,9 @@ def gate_data(df, gates):
 def rename_multilevel_cols(index):
     if index[1] == '': return index[0]
     else: return index[0] + '_' + index[1]
+
+def get_slope(df):
+    slope, intercept, r_value, p_value, stderr = sp.stats.linregress(df['bin_marker_quantiles_median_log'], df['output_gmean_log'])
+    result = pd.DataFrame(columns=['slope', 'intercept_log', 'r_value', 'p_value', 'stderr'])
+    result.loc[len(result.index)] = [slope, intercept, r_value, p_value, stderr]
+    return result
