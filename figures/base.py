@@ -15,6 +15,7 @@ import seaborn as sns
 # Sizes are relevant for paper-size figures
 font_sizes = {
     'base_size': 8,
+    'smaller_size': 7,
     'subpanel_label': 10,
     'poster_base': 16,
     'poster_subpanel': 24,
