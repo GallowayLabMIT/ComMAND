@@ -125,7 +125,7 @@ def get_metadata(path, style='tuning'):
     metadata = pd.read_excel(path)
 
     metadata['color'] = metadata['group'].replace(group_palette)
-    metadata['markers'] = metadata['group'].replace(group_markers)
+    metadata['markers'] = 'o' #metadata['group'].replace(group_markers)
     if style=='tuning': return apply_style_tuning(metadata)
     elif style=='promoters': return apply_style_promoters(metadata)
 
