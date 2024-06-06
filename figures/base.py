@@ -150,10 +150,10 @@ def get_slope(df):
     result.loc[len(result.index)] = [slope, intercept, r_value, p_value, stderr]
     return result
 
-def calculate_bins_stats(df, by=['construct','exp','biorep'], stat_list=[sp.stats.gmean, np.std]):
+def calculate_bins_stats(df, by=['construct','exp','biorep'], stat_list=[sp.stats.gmean, np.std], num_bins=20):
 
     # Bin by marker quantiles
-    df['bin_marker_quantiles'] = df.groupby(by)['marker'].transform(lambda x: pd.qcut(x, q=20, duplicates='drop'))
+    df['bin_marker_quantiles'] = df.groupby(by)['marker'].transform(lambda x: pd.qcut(x, q=num_bins, duplicates='drop'))
     quantiles = df.groupby(by+['bin_marker_quantiles'])['marker'].median().rename('bin_marker_quantiles_median').reset_index()
     df_quantiles = df.merge(quantiles, how='left', on=by+['bin_marker_quantiles'])
 
