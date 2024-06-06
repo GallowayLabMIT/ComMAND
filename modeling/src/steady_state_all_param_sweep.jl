@@ -64,6 +64,14 @@ end
 
 logrange_around_param(p, decades, n) = 10.0 .^ range(log10(p) - (decades / 2.0), log10(p) + (decades / 2.0), n)
 
+sweep_df = DataFrame(
+    param=String[],
+    param_val=Float64[],
+    copy_num=Int[],
+    protein=Float64[]
+)
+
+# Calculate protein values & plot
 for (key, val) ∈ param_dict
     if key ∈ [:regulated_copy]
         continue
@@ -77,14 +85,27 @@ for (key, val) ∈ param_dict
     f = Figure()
     ax = Axis(f[1,1], xlabel="Copy number", ylabel="Steady state protein", title="Sweep of $(String(key))")
     for (idx, iterval) ∈ enumerate(param_range)
+        copy_n = 1:100
+        prot = calculate_protein.(key, iterval, copy_n)
         lines!(
-            ax, 1:100, calculate_protein.(key, iterval, 1:100),
+            ax, copy_n, prot,
             label="$(@sprintf("%.1f", iterval / val))x",
             color = idx, colormap = :viridis, colorrange = (0, 12))
+
+        df = DataFrame(
+            param=String(key),
+            param_val=iterval,
+            copy_num=copy_n,
+            protein=prot
+        )
+        append!(sweep_df,df)
     end
+
     hidespines!(ax, :r)
     hidespines!(ax, :t)
     axislegend(ax, position=:rb)
     save("$outdir/$(String(key)).pdf", f)
     save("$outdir/$(String(key)).svg", f)
 end
+
+Parquet2.writefile("$outdir/sweep_df.gzip", sweep_df; compression_codec=:gzip)

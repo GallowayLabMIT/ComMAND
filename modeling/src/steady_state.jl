@@ -238,4 +238,5 @@ sweep_df = DataFrame(
     protein=protein_vals
 )
 
+
 Parquet2.writefile("$outdir/sweep_df.gzip", sweep_df; compression_codec=:gzip)
