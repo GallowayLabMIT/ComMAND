@@ -209,3 +209,13 @@ def calculate_bins_stats(df, by=['construct','exp','biorep'], stat_list=[sp.stat
     #fits['intercept'] = fits['intercept_log'].apply(lambda x: 10**x)
     
     return df_quantiles, stats, stats_quantiles, fits
+
+def truncated_poisson(x, mu):
+    lower_bound = 1
+    # from julia
+    #   lcdf = isinf(l) ? 0.0 : cdf(d, l)
+    #   ucdf = isinf(u) ? 1.0 : cdf(d, u)
+    #   tp = ucdf - lcdf
+    #   pdf{T<:Real}(d::Truncated, x::T) = d.lower <= x <= d.upper ? pdf(d.untruncated, x) / d.tp : zero(T)
+    truncated_region = 1 - sp.stats.poisson.cdf(lower_bound, mu)
+    return sp.stats.poisson.pmf(x, mu) / truncated_region
