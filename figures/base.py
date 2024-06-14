@@ -145,6 +145,29 @@ def apply_style_designs(metadata):
 
     return metadata
 
+def apply_style_applications(metadata):
+
+    # Create color palette for comparing promoters
+    metadata.loc[(metadata['group']=='marker'), 'color'] = 'black'
+    metadata.loc[(metadata['group']=='base'), 'color'] = 'black'
+
+    metadata.loc[(metadata['group']=='controller') & (metadata['name'].str.contains('FMRP')), 'color'] = colors['orange']
+    metadata.loc[(metadata['group']=='controller') & (metadata['name'].str.contains('FXN')), 'color'] = colors['red']
+    metadata.loc[(metadata['group']=='controller') & (metadata['name'].str.contains('Cre')), 'color'] = colors['green']
+
+    metadata.loc[(metadata['ts_kind']=='NT'), 'color'] = colors['gray']
+    metadata.loc[(metadata['ts_kind']=='NT') & (metadata['name'].str.contains('FMRP')), 'color'] = metadata.loc[(metadata['ts_kind']=='NT') & (metadata['name'].str.contains('FMRP')), 'color'].apply(get_light_color)
+
+    # markers
+    metadata['markers'] = 'o'
+    metadata.loc[(metadata['group']=='base'), 'markers'] = 'X'
+
+    # linestyles
+    metadata['linestyle'] = '-' # default is solid
+    metadata.loc[metadata['group']=='marker', 'linestyle'] = ':'
+
+    return metadata
+
 def get_metadata(path, style='tuning'):
 
     metadata = pd.read_excel(path)
@@ -154,6 +177,7 @@ def get_metadata(path, style='tuning'):
     if style=='tuning': return apply_style_tuning(metadata)
     elif style=='promoters': return apply_style_promoters(metadata)
     elif style=='designs': return apply_style_designs(metadata)
+    elif style=='applications': return apply_style_applications(metadata)
 
 
 def gate_data(df, gates):
