@@ -151,8 +151,8 @@ def apply_style_applications(metadata):
     metadata.loc[(metadata['group']=='marker'), 'color'] = 'black'
     metadata.loc[(metadata['group']=='base'), 'color'] = 'black'
 
-    metadata.loc[(metadata['group']=='controller') & (metadata['name'].str.contains('FMRP')), 'color'] = colors['orange']
-    metadata.loc[(metadata['group']=='controller') & (metadata['name'].str.contains('FXN')), 'color'] = colors['red']
+    metadata.loc[(metadata['group']=='controller') & (metadata['name'].str.contains('FMRP')), 'color'] = colors['red']
+    metadata.loc[(metadata['group']=='controller') & (metadata['name'].str.contains('FXN')), 'color'] = colors['orange']
     metadata.loc[(metadata['group']=='controller') & (metadata['name'].str.contains('Cre')), 'color'] = colors['green']
 
     metadata.loc[(metadata['ts_kind']=='NT'), 'color'] = colors['gray']
