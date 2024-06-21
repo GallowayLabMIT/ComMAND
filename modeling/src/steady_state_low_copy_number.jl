@@ -8,16 +8,27 @@ using DataFrames
 using Parquet2
 
 # Make the output directory if it does not exist
-outdir = "$(@__DIR__)/../../output/modeling/julia_param_sweeps/per_param"
+outdir = "$(@__DIR__)/../../output/modeling/steady_state_low_copy_number"
 mkpath(outdir)
+datadir = open(io->read(io, String),"$(@__DIR__)/../../datadir.txt")
 
 
-param_dict = Dict(Symbol(k) => v for (k,v) ∈ ModelingToolkit.get_defaults(single_transcript_iFFL))
+
+struct SingleTranscript end
+struct DualTranscript end
+struct DualTranscriptU6 end
+
+param_dict = Dict{Symbol,Any}(Symbol(k) => v for (k,v) ∈ ModelingToolkit.get_defaults(single_transcript_iFFL))
 param_dict[:Rtot] = 1e5
+param_dict[:transcript_type] = SingleTranscript()
+param_dict[:ζ] = 0.7
 
 # RI = R / (κ1 + κ2 R)
 # RIM = R / (κ3 + κ4 R)
-pre(p) = p[:r_splicing] / p[:r_dicer] * (p[:regulated_copy] * p[:α_im]) / (p[:δ_im] + p[:r_splicing])
+pre(p, _::SingleTranscript) = p[:r_splicing] / p[:r_dicer] * (p[:regulated_copy] * p[:α_im]) / (p[:δ_im] + p[:r_splicing])
+pre(p, _::DualTranscript) = p[:r_splicing] / p[:r_dicer] * (p[:unregulated_copy] * p[:α_im]) / (p[:δ_im] + p[:r_splicing])
+pre(p, _::DualTranscriptU6) = p[:u6_copy] * p[:α_u6] / p[:r_dicer]
+pre(p) = pre(p, p[:transcript_type])
 r_regulated(p) = p[:regulated_copy] * p[:α_im]
 κ1(p) = (p[:k_miRNA_deg] * p[:δ_mi]) / (p[:k_miRNA_bind] * p[:r_dicer] * pre(p))
 κ2(p) = (p[:k_miRNA_deg]) / (p[:r_dicer] * pre(p))
@@ -52,60 +63,42 @@ function find_R_vals(params)
     return map(real, filter(x->imag(x)==0.0 && real(x) > 0, roots))
 end
 
-function calculate_protein(param, value, copy_number)
+function calculate_protein(r_tot, transcript_type, copy_number)
     params = deepcopy(param_dict)
-    params[param] = value
+    params[:Rtot] = r_tot
+    params[:transcript_type] = transcript_type
     params[:regulated_copy] = copy_number
+    params[:unregulated_copy] = copy_number
     R_vals = find_R_vals(params)
     @assert length(R_vals) == 1
     protein(R_vals[1], params)
 end
 
-
-logrange_around_param(p, decades, n) = 10.0 .^ range(log10(p) - (decades / 2.0), log10(p) + (decades / 2.0), n)
-
-sweep_df = DataFrame(
-    param=String[],
-    param_val=Float64[],
-    copy_num=Int[],
-    protein=Float64[]
+# Load stocahstic sim dataframes
+stochastic_sims = DataFrame(Parquet2.readfile("$datadir/projects/miR-iFFL/modeling/julia_stochastic_simulations/stochastic_sims.gzip"))
+unique(stochastic_sims.design)
+# Compare "Design 1", "Dual Transcript", and "Dual Vector"
+design_mapping = Dict(["Design 1" => SingleTranscript(), "Dual Transcript" => DualTranscript(), "Dual Vector" => DualTranscript()])
+for (design, moi, R_tot) ∈ Iterators.product(
+    ["Design 1", "Dual Transcript", "Dual Vector"],
+    unique(stochastic_sims.moi),
+    unique(stochastic_sims.risc),
 )
-
-# Calculate protein values & plot
-for (key, val) ∈ param_dict
-    if key ∈ [:regulated_copy]
+    f = Figure()
+    ax = Axis(f[1,1], title="$design: moi=$moi, RISC=$R_tot")
+    plot_df = stochastic_sims[
+        (stochastic_sims.risc .== R_tot) .&
+        (stochastic_sims.design .== design) .&
+        (stochastic_sims.moi .== moi), :]
+    if size(plot_df, 1) == 0
         continue
     end
+    scatter!(ax, plot_df.copynum, plot_df.reg_gene, color=(:blue, 0.05))
+    scatter!(ax, plot_df.copynum, plot_df.unreg_gene, color=(:gray, 0.05))
 
-    if key == :ζ
-        param_range = 0.0:0.1:1.0
-    else
-        param_range = logrange_around_param(val, 1, 11)
-    end
-    f = Figure()
-    ax = Axis(f[1,1], xlabel="Copy number", ylabel="Steady state protein", title="Sweep of $(String(key))")
-    for (idx, iterval) ∈ enumerate(param_range)
-        copy_n = 1:100
-        prot = calculate_protein.(key, iterval, copy_n)
-        lines!(
-            ax, copy_n, prot,
-            label="$(@sprintf("%.1f", iterval / val))x",
-            color = idx, colormap = :viridis, colorrange = (0, 12))
-
-        df = DataFrame(
-            param=String(key),
-            param_val=iterval,
-            copy_num=copy_n,
-            protein=prot
-        )
-        append!(sweep_df,df)
-    end
-
-    hidespines!(ax, :r)
-    hidespines!(ax, :t)
-    axislegend(ax, position=:rb)
-    save("$outdir/$(String(key)).pdf", f)
-    save("$outdir/$(String(key)).svg", f)
+    max_copy_number = maximum(plot_df.copynum)
+    x_range = 1:max_copy_number
+    ss_result = calculate_protein.(R_tot, [design_mapping[design]], x_range)
+    lines!(ax, x_range, ss_result)
+    display(f)
 end
-
-Parquet2.writefile("$outdir/sweep_df.gzip", sweep_df; compression_codec=:gzip)
