@@ -1,0 +1,128 @@
+% fig_overview
+\begin{figure}[htbp]
+    \centering
+    {\includegraphics[width=\textwidth]{figs/fig_overview}
+    \phantomsubcaption\label{fig:transgene_expression_range}    % A
+    \phantomsubcaption\label{fig:controller_block_diagram}      % B
+    \phantomsubcaption\label{fig:construct_design}              % C
+    \phantomsubcaption\label{fig:expected_behavior}             % D
+    \phantomsubcaption\label{fig:initial_circuit_2d}            % E
+    \phantomsubcaption\label{fig:initial_circuit_stats}         % F
+    }
+
+% fig_tuning-supp
+\begin{figure}[htbp]
+    \centering
+    {\includegraphics[width=\textwidth]{figs/fig_tuning-supp}
+    \phantomsubcaption\label{fig:miR_characterization_schematic}    % A
+    \phantomsubcaption\label{fig:miR_vary_ts_orthogonal}            % B
+    \phantomsubcaption\label{fig:miR_vary_ts_orthogonal_full}       % C
+    \phantomsubcaption\label{fig:miR_only_CDS}                      % D
+    \phantomsubcaption\label{fig:ts_only_3prime}                    % E
+    \phantomsubcaption\label{fig:miR_vary_ts_num}                   % F
+    \phantomsubcaption\label{fig:miR_vary_ts_num_full}              % G
+    \phantomsubcaption\label{fig:miR_sequence_scaffold_std}         % H
+    \phantomsubcaption\label{fig:promoter_choice_std}               % I
+    \phantomsubcaption\label{fig:num_ts_std}                        % J
+    }
+
+% fig_tuning
+\begin{figure}[htbp]
+    \centering
+    {\includegraphics[width=\textwidth]{figs/fig_tuning}
+    \phantomsubcaption\label{fig:miR_sequence}                  % A
+    \phantomsubcaption\label{fig:miR_scaffold}                  % B
+    \phantomsubcaption\label{fig:miR_sequence_scaffold_stats}   % C
+    \phantomsubcaption\label{fig:promoter_choice}               % D
+    \phantomsubcaption\label{fig:num_target_sites}              % E
+    }
+
+% fig_model
+\begin{figure}[htbp]
+    \centering
+    {\includegraphics[width=\textwidth]{figs/fig_model}
+    \phantomsubcaption\label{fig:model_schematic}       % A
+    \phantomsubcaption\label{fig:model_total_RISC}      % B
+    \phantomsubcaption\label{fig:model_TX_rate}         % C
+    \phantomsubcaption\label{fig:model_miR_processing}  % D
+    \phantomsubcaption\label{fig:model_knockdown}       % E
+    \phantomsubcaption\label{fig:data_knockdown}        % F
+    \phantomsubcaption\label{fig:model_TL}              % G
+    \phantomsubcaption\label{fig:model_deg}             % H
+    }
+
+% fig_model-supp
+\begin{figure}[htbp]
+    \centering
+    {\includegraphics[width=\textwidth]{figs/fig_model-supp}
+    \phantomsubcaption\label{fig:model_more_TX}                 % A 
+    \phantomsubcaption\label{fig:model_more_miR_processing}     % B
+    \phantomsubcaption\label{fig:model_more_knockdown}          % C
+    \phantomsubcaption\label{fig:model_more_TL}                 % D
+    \phantomsubcaption\label{fig:model_more_deg}                % E
+    }
+
+% fig_architecture
+\begin{figure}[htbp]
+    \centering
+    {\includegraphics[width=\textwidth]{figs/fig_architecture}
+    \phantomsubcaption\label{fig:two_gene_schematic}        % A
+    \phantomsubcaption\label{fig:two_gene_stats}            % B
+    \phantomsubcaption\label{fig:two_gene_model_schematic}  % C
+    \phantomsubcaption\label{fig:stochastic_sims}           % D
+    }
+
+% fig_architecture-supp
+\begin{figure}[htbp]
+    \centering
+    {\includegraphics[width=\textwidth]{figs/fig_architecture-supp}
+    \phantomsubcaption\label{fig:two_gene_std}              % A
+    \phantomsubcaption\label{fig:2V_U6}                     % B
+    \phantomsubcaption\label{fig:poisson}                   % C
+    \phantomsubcaption\label{fig:stochastic_sims_stats}     % D
+    }
+
+% fig_designs
+\begin{figure}[htbp]
+    \centering
+    {\includegraphics[scale=0.92]{figs/fig_designs}
+    \phantomsubcaption\label{fig:designs_schematic}         % A
+    \phantomsubcaption\label{fig:designs_293T_transfection} % B
+    \phantomsubcaption\label{fig:designs_293T_PiggyBac}     % C
+    \phantomsubcaption\label{fig:designs_293T_lenti}        % D
+    \phantomsubcaption\label{fig:designs_293T_lenti_2d}     % E
+    }
+
+% fig_designs-supp
+\begin{figure}[htbp]
+    \centering
+    {\includegraphics[width=\textwidth]{figs/fig_designs-supp}
+    \phantomsubcaption\label{fig:miR_only_UTR}              % A
+    \phantomsubcaption\label{fig:ts_only_5prime}            % B
+    \phantomsubcaption\label{fig:designs_std}               % C
+    \phantomsubcaption\label{fig:designs_miR-FF4}           % D
+    \phantomsubcaption\label{fig:designs_miR-FF5}           % E
+    \phantomsubcaption\label{fig:designs_miRE-FF5}          % F
+    \phantomsubcaption\label{fig:two_gene_designs_schematic}% G
+    \phantomsubcaption\label{fig:two_gene_designs_stats}    % H
+    }
+
+% fig_designs-generalize-supp: TODO
+\begin{figure}[htbp]
+    \centering
+    {%\includegraphics[width=\textwidth]{figs/fig_designs-generalize-supp}
+    \phantomsubcaption\label{fig:lenti_PB_constructs}
+    \phantomsubcaption\label{fig:lenti_293T_controls}
+    \phantomsubcaption\label{fig:lenti_293T_nodox}
+    }
+
+% fig_applications
+\begin{figure}[htbp]
+    %\centering
+    {\includegraphics[scale=0.92]{figs/fig_applications}
+    \phantomsubcaption\label{fig:designs_MEF_lenti}     % A
+    \phantomsubcaption\label{fig:designs_Tcell_lenti}   % B
+    \phantomsubcaption\label{fig:designs_neuron_lenti}  % C
+    \phantomsubcaption\label{fig:app_fxn}               % D
+    \phantomsubcaption\label{fig:app_fmrp}              % E
+    }
