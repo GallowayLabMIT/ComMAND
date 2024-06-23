@@ -135,6 +135,14 @@ def apply_style_designs(metadata):
     metadata.loc[(metadata['ts_kind']=='NT') & (metadata['design']==1), 'color'] = metadata.loc[(metadata['ts_kind']=='NT') & (metadata['design']==1), 'color'].apply(get_light_color)
     metadata.loc[(metadata['ts_kind']=='NT') & (metadata['design']==3), 'color'] = metadata.loc[(metadata['ts_kind']=='NT') & (metadata['design']==3), 'color'].apply(get_dark_color)
 
+    metadata.loc[(metadata['group']=='miR'), 'color'] = colors['purple']
+    metadata.loc[(metadata['group']=='miR') & (metadata['miR'].isin(['miR.FF5','miRE.FF5'])), 'color'] = metadata.loc[(metadata['group']=='miR') & (metadata['miR'].isin(['miR.FF5','miRE.FF5'])), 'color'].apply(get_light_color)
+
+    metadata.loc[(metadata['group'].isin(['ts3','ts5'])), 'color'] = colors['blue']
+    metadata.loc[(metadata['group'].isin(['ts3','ts5'])) & (metadata['ts'].isin(['FF6x1','FF6x2','FF6x4'])), 'color'] = metadata.loc[(metadata['group'].isin(['ts3','ts5'])) & (metadata['ts'].isin(['FF6x1','FF6x2','FF6x4'])), 'color'].apply(get_dark_color)
+    metadata.loc[(metadata['group'].isin(['ts3','ts5'])) & (metadata['ts'].isin(['FF4x1','FF4x2','FF4x4'])), 'color'] = metadata.loc[(metadata['group'].isin(['ts3','ts5'])) & (metadata['ts'].isin(['FF4x1','FF4x2','FF4x4'])), 'color'].apply(get_light_color)
+    metadata.loc[(metadata['group'].isin(['ts3','ts5'])) & (metadata['ts']=='FF3x1'), 'color'] = metadata.loc[(metadata['group'].isin(['ts3','ts5'])) & (metadata['ts']=='FF3x1'), 'color'].apply(get_light_color).apply(get_light_color)
+
     # markers
     metadata['markers'] = 'o'
     metadata.loc[(metadata['group']=='base'), 'markers'] = 'X'
