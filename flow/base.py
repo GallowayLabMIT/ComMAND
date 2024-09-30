@@ -7,6 +7,7 @@ This is intended to be imported by Jupyter
 notebooks that are used to render each figure.
 """
 import matplotlib.pyplot as plt
+import numpy as np
 import rushd as rd
 import pandas as pd
 import scipy as sp
@@ -37,7 +38,7 @@ group_palette = {
 group_markers = {
     'un': 'H',
     'marker': 'p',
-    'base': 'D',
+    'base': 'X',
     'controller': 'o', 
     'miR': 'P',
     'ts3': '^',        
@@ -58,7 +59,8 @@ def get_metadata(path):
 
     # Apply marker styles
     metadata['markers'] = metadata['group'].replace(group_markers)
-    metadata.loc[(metadata['group']=='controller') & (metadata['ts_kind']=='NT'), 'markers'] = 'X'
+    #metadata.loc[(metadata['group']=='controller') & (metadata['ts_kind']=='NT'), 'markers'] = 'X'
+    #metadata.loc[(metadata['group']=='marker'), 'markers'] = 'X'
 
     return metadata
 
@@ -81,3 +83,37 @@ def get_slope(df):
     result = pd.DataFrame(columns=['slope', 'intercept_log', 'r_value', 'p_value', 'stderr'])
     result.loc[len(result.index)] = [slope, intercept, r_value, p_value, stderr]
     return result
+
+def calculate_bins_stats(df, by=['construct','exp','biorep'], stat_list=[sp.stats.gmean, np.std], num_bins=20):
+
+    # Bin by marker quantiles
+    df['bin_marker_quantiles'] = df.groupby(by)['marker'].transform(lambda x: pd.qcut(x, q=num_bins, duplicates='drop'))
+    quantiles = df.groupby(by+['bin_marker_quantiles'])['marker'].median().rename('bin_marker_quantiles_median').reset_index()
+    df_quantiles = df.merge(quantiles, how='left', on=by+['bin_marker_quantiles'])
+
+    # Population stats
+    grouped = df_quantiles.groupby(by=by)
+    stats = grouped[['marker','output']].agg(stat_list).reset_index().dropna()
+
+    # Rename columns as 'col_stat'
+    stats.columns = stats.columns.map(lambda i: rename_multilevel_cols(i))
+    stats['count'] = grouped['output'].count().reset_index()['output']
+
+    # Quantile stats & slope
+    df_quantiles['bin_marker_quantiles_median_log'] = df_quantiles['bin_marker_quantiles_median'].apply(np.log10)
+    df_quantiles['output_log'] = df_quantiles['output'].apply(np.log10)
+    grouped = df_quantiles.groupby(by=by+['bin_marker_quantiles_median'])
+    stats_quantiles = grouped[['marker','output']].agg(stat_list).reset_index().dropna()
+
+    # Rename columns as 'col_stat'
+    stats_quantiles.columns = stats_quantiles.columns.map(lambda i: rename_multilevel_cols(i))
+    stats_quantiles['count'] = grouped['output'].count().reset_index()['output']
+    stats_quantiles['bin_marker_quantiles_median_log'] = stats_quantiles['bin_marker_quantiles_median'].apply(np.log10)
+    stats_quantiles['output_gmean_log'] = stats_quantiles['output_gmean'].apply(np.log10)
+
+    # Compute slope
+    fits = stats_quantiles.groupby(by)[stats_quantiles.columns].apply(get_slope).reset_index()
+    #display(fits['intercept_log'].max())
+    #fits['intercept'] = fits['intercept_log'].apply(lambda x: 10**x)
+    
+    return df_quantiles, stats, stats_quantiles, fits
