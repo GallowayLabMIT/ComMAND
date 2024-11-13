@@ -417,8 +417,8 @@ def load_plates_miR_characterization(base_path):
 
     # Indicate which channels are relevant for each experiment
     gates.sort_values(['exp'], inplace=True)
-    gates['marker'] = 'mGL-A'
-    gates['output'] = 'mRuby2-A'
+    gates['marker'] = 'mRuby2-A'
+    gates['output'] = 'mGL-A'
 
     # Gate data by marker expression
     data = data.groupby('exp')[data.columns].apply(lambda x: gate_data(x,gates))
@@ -451,7 +451,7 @@ def load_plates_two_gene(base_path):
     for channel in channel_list:
         gates[channel] = data[data['construct']=='GEEC555'].groupby(['exp'])[channel].apply(lambda x: x.quantile(0.999))
     gates.reset_index(inplace=True)
-    display(gates)
+    
     # Add manual iRFP670 gate (forgot to include untransfected well)
     gate_iRFP = 2.5e2
     gates['iRFP670-A'] = [gate_iRFP]*len(data['exp'].unique())
@@ -772,7 +772,7 @@ def load_plates_lenti_therapeutic(base_path):
 
 def load_data(base_path, metadata_path, which, metadata_style='tuning'):
     if which == 'tuning': return load_data_tuning(base_path, metadata_path, metadata_style)
-    elif which == 'miR_characterization': return load_data_miR_characterization(base_path, metadata_path, metadata_style)
+    elif which == 'miR_characterization': return load_data_miR_characterization(base_path, metadata_path)
     elif which == 'two_gene': return load_data_two_gene(base_path, metadata_path, metadata_style)
     elif which == 'piggybac': return load_data_piggybac(base_path, metadata_path, metadata_style)
     elif which == 'lenti': return load_data_lenti(base_path, metadata_path, metadata_style) # all lentivirus data (all cell types)
