@@ -811,7 +811,7 @@ def load_data(base_path, metadata_path, which, metadata_style='tuning'):
     if which == 'tuning': return load_data_tuning(base_path, metadata_path, metadata_style)
     elif which == 'plasmid_titration': return load_data_plasmid_titration(base_path, metadata_path)
     elif which == 'miR_characterization': return load_data_miR_characterization(base_path, metadata_path)
-    elif which == 'two_gene': return load_data_two_gene(base_path, metadata_path, metadata_style)
+    elif which == 'two_gene': return load_data_two_gene(base_path, metadata_path)
     elif which == 'piggybac': return load_data_piggybac(base_path, metadata_path, metadata_style)
     elif which == 'lenti': return load_data_lenti(base_path, metadata_path, metadata_style) # all lentivirus data (all cell types)
     elif which == 'application': return load_data_application(base_path, metadata_path, metadata_style) # iPS11 and therapeutic gene transfections
@@ -925,8 +925,24 @@ def load_data_two_gene(base_path, metadata_path):
 
     # Combine metadata
     metadata = data.drop_duplicates('condition')[['construct','construct2','condition']]
+    metadata.dropna(inplace=True)
     metadata = metadata.merge(metadata1, how='left', on='construct')
     metadata = metadata.merge(metadata2, how='left', on='construct2')
+
+    # Create color/marker palettes
+    metadata.loc[metadata['gene']=='1T', 'color'] = colors['teal']
+    metadata.loc[metadata['gene']=='2T', 'color'] = colors['green']
+    metadata.loc[metadata['gene']=='2V', 'color'] = colors['purple']
+
+    # markers
+    metadata['markers'] = 'X'
+    metadata.loc[metadata['gene']=='1T', 'markers'] = 'o'
+    metadata.loc[metadata['gene']=='2T', 'markers'] = 'D'
+    metadata.loc[metadata['gene']=='2V', 'markers'] = 's'
+
+    ts_label = {'na': 'base', 'NT': 'OL', 'T': 'CL', 'none': '–'}
+    metadata['ts_label'] = metadata['ts_kind'].replace(ts_label)
+    metadata['kind'] = metadata['gene'] + '_' + metadata['design'].astype(int).astype(str)
 
     return data, df_quantiles, df_stats, metadata
 
