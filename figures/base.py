@@ -1084,8 +1084,9 @@ def load_modeling_stochastic_sims(base_path):
     data['design'] = data['design'].map({'Design 1': 1, 'Design 2': 2, 'Design 3': 3,
                                             'Dual Vector': 0, 'Dual Transcript': 0})
     data['kind'] = data['gene'] + '_' + data['design'].astype(str)
-    
+    data['condition'] = data['gene']+ '_' + data['moi'].astype(str)
+
     # Bin data and calculate statistics
-    _, df_stats = calculate_bins_stats(data, by=['design','moi','risc','gene','kind'])
+    _, df_stats = calculate_bins_stats(data, by=['condition','design','moi','risc','gene','kind'])
 
     return data, df_stats
