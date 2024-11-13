@@ -293,6 +293,7 @@ def modify_norm_factor(df):
 def load_plates(data_group, base_path):
     if data_group == 'tuning': return load_plates_tuning(base_path)
     elif data_group == 'miR_characterization': return load_plates_miR_characterization(base_path)
+    elif data_group == 'plasmid_titration': return load_plates_plasmid_titration(base_path)
     elif data_group == 'two_gene': return load_plates_two_gene(base_path)
     elif data_group == 'piggybac': return load_plates_piggybac(base_path)
     elif data_group == 'lenti_293T_MEF': return load_plates_lenti_293T_mef(base_path)
@@ -371,6 +372,42 @@ def load_plates_tuning(base_path):
     
     return data
     
+def load_plates_plasmid_titration(base_path): 
+    exp100_path = base_path/'kasey'/'2024.07.18_exp100'/'export'
+
+    plates = pd.DataFrame({
+        'data_path': [exp100_path, base_path/'kasey'/'2024.09.11_exp100.3'/'export', base_path/'kasey'/'2024.09.28_exp100.5'/'export'],
+        'yaml_path': [exp100_path/'wells.yaml']*3,
+        'biorep': [1,2,3],
+        'exp': ['exp100.1','exp100.3','exp100.5'],
+    })
+
+    channel_list = ['mRuby2-A','tagBFP-A','mGL-A']
+    data = rd.flow.load_groups_with_metadata(plates, columns=channel_list)
+
+    # Remove negative channel values
+    for c in channel_list: data = data[data[c]>0]
+
+    gates = pd.DataFrame()
+    for channel in channel_list:
+        gates[channel] = data[data['construct']=='UT'].groupby(['exp'])[channel].apply(lambda x: x.quantile(0.999))
+    gates.reset_index(inplace=True)
+
+    # Add missing gate for exp100
+    gates.loc[len(gates.index)] = ['exp100.1', gates['mGL-A'].mean(), gates['mRuby2-A'].mean(), gates['tagBFP-A'].mean()] 
+
+    # Indicate which channels are relevant for each experiment
+    gates['marker'] = 'mGL-A'
+    gates['output'] = 'mRuby2-A'
+    gates['filler'] = 'tagBFP-A'
+
+    # Gate data by marker expression
+    data = data.groupby('exp')[data.columns].apply(lambda x: gate_data(x,gates))
+    data.reset_index(inplace=True, drop=True)
+    data['gated'] = data['expressing'] & (data['construct']!='UT')
+
+    return data
+
 def load_plates_miR_characterization(base_path): 
     exp11_path = base_path/'Emma'/'2022.10.11_EXP11'/'Data'
     exp11_controls_path = base_path/'Emma'/'2022.10.11_EXP10'/'data_controls'
@@ -772,6 +809,7 @@ def load_plates_lenti_therapeutic(base_path):
 
 def load_data(base_path, metadata_path, which, metadata_style='tuning'):
     if which == 'tuning': return load_data_tuning(base_path, metadata_path, metadata_style)
+    elif which == 'plasmid_titration': return load_data_plasmid_titration(base_path, metadata_path)
     elif which == 'miR_characterization': return load_data_miR_characterization(base_path, metadata_path)
     elif which == 'two_gene': return load_data_two_gene(base_path, metadata_path, metadata_style)
     elif which == 'piggybac': return load_data_piggybac(base_path, metadata_path, metadata_style)
@@ -794,6 +832,27 @@ def load_data_tuning(base_path, metadata_path, metadata_style):
 
     # Add metadata
     metadata = get_metadata(metadata_path/'construct-metadata.xlsx', style=metadata_style)
+    data = data.merge(metadata, how='left', on='construct')
+    df_quantiles = df_quantiles.merge(metadata, how='left', on='construct')
+    df_stats = df_stats.merge(metadata, how='left', on='construct')
+
+    return data, df_quantiles, df_stats, metadata
+
+def load_data_plasmid_titration(base_path, metadata_path):
+
+    # Load and gate raw data
+    cache_path = rd.rootdir/'data'/('plasmid_titration.gzip')
+    data = pd.DataFrame()
+    if cache_path.is_file(): data = pd.read_parquet(cache_path)
+    else: 
+        data = load_plates('plasmid_titration', base_path)
+        data.to_parquet(rd.outfile(cache_path))
+
+    # Bin data and calculate statistics
+    df_quantiles, df_stats = calculate_bins_stats(data[data['gated']], by=['construct','amount','exp','biorep'])
+
+    # Add metadata
+    metadata = get_metadata(metadata_path/'construct-metadata.xlsx')
     data = data.merge(metadata, how='left', on='construct')
     df_quantiles = df_quantiles.merge(metadata, how='left', on='construct')
     df_stats = df_stats.merge(metadata, how='left', on='construct')
