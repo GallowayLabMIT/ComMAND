@@ -645,6 +645,7 @@ def load_plates_lenti_tcell(base_path):
     data.loc[data['biorep']==2, 'live'] = data.loc[data['biorep']==2, 'livedead-A'] < 7e4
 
     data['gated'] = data['expressing'] & data['live'] & (data['construct']!='UT')
+    data['cell'] = 'tcell'
     
     return data
 
@@ -701,6 +702,8 @@ def load_plates_lenti_ips11(base_path):
 
     # Add more metadata
     data['exp'] = 'exp116_' + data['biorep'].astype(str)
+    data['cell'] = 'iPS11'
+    data['moi'] = 1
 
     # Remove negative channel values
     for c in channel_list: data = data[data[c]>0]
@@ -814,7 +817,7 @@ def load_data(base_path, metadata_path, which, metadata_style='tuning'):
     elif which == 'two_gene': return load_data_two_gene(base_path, metadata_path)
     elif which == 'piggybac': return load_data_piggybac(base_path, metadata_path, metadata_style)
     elif which == 'lenti': return load_data_lenti(base_path, metadata_path) # all lentivirus data (all cell types)
-    elif which == 'application': return load_data_application(base_path, metadata_path, metadata_style) # iPS11 and therapeutic gene transfections
+    elif which == 'application': return load_data_application(base_path, metadata_path) # iPS11 and therapeutic gene transfections
     else: print(f'{which} is not a valid data group.')
 
 def load_data_tuning(base_path, metadata_path, metadata_style):
@@ -986,15 +989,19 @@ def load_data_lenti(base_path, metadata_path):
     data = pd.concat(data_list, ignore_index=True)
 
     # Bin data and calculate statistics
-    df_quantiles, df_stats = calculate_bins_stats(data[data['gated']], by=['construct','moi','dox','cell','biorep','exp'])
+    fewer_bins = ['neuron','iPS11']
+    df_quantiles, df_stats = calculate_bins_stats(data[(data['gated']) & ~(data['cell'].isin(fewer_bins))].copy(), by=['construct','moi','dox','cell','biorep','exp'])
+    df_quantiles2, df_stats2 = calculate_bins_stats(data[(data['gated']) & (data['cell'].isin(fewer_bins))].copy(), by=['construct','moi','dox','cell','biorep','exp'], num_bins=10)
+    quantiles = pd.concat([df_quantiles, df_quantiles2], ignore_index=True)
+    stats = pd.concat([df_stats, df_stats2], ignore_index=True)
 
     # Add metadata
     metadata = get_metadata(metadata_path/'construct-metadata.xlsx', 'designs')
     data = data.merge(metadata, how='left', on='construct')
-    df_quantiles = df_quantiles.merge(metadata, how='left', on='construct')
-    df_stats = df_stats.merge(metadata, how='left', on='construct')
+    quantiles = quantiles.merge(metadata, how='left', on='construct')
+    stats = stats.merge(metadata, how='left', on='construct')
 
-    return data, df_quantiles, df_stats, metadata
+    return data, quantiles, stats, metadata
 
 # Combine data from application-relevant transfections
 def load_data_application(base_path, metadata_path):
@@ -1016,7 +1023,7 @@ def load_data_application(base_path, metadata_path):
     data = pd.concat(data_list, ignore_index=True)
 
     # Add metadata
-    metadata = get_metadata(metadata_path/'construct-metadata.xlsx')
+    metadata = get_metadata(metadata_path/'construct-metadata.xlsx', 'applications')
     data = data.merge(metadata, how='left', on='construct')
     data = data[~data['construct'].isna()]
     
@@ -1025,7 +1032,6 @@ def load_data_application(base_path, metadata_path):
 
     # Bin data and calculate statistics
     df_quantiles, df_stats = calculate_bins_stats(data[data['gated']], by=['data_group','construct','biorep','exp'])
-    df_quantiles = df_quantiles.merge(metadata, how='left', on='construct')
     df_stats = df_stats.merge(metadata, how='left', on='construct')
 
     return data, df_quantiles, df_stats, metadata
