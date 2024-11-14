@@ -813,7 +813,7 @@ def load_data(base_path, metadata_path, which, metadata_style='tuning'):
     elif which == 'miR_characterization': return load_data_miR_characterization(base_path, metadata_path)
     elif which == 'two_gene': return load_data_two_gene(base_path, metadata_path)
     elif which == 'piggybac': return load_data_piggybac(base_path, metadata_path, metadata_style)
-    elif which == 'lenti': return load_data_lenti(base_path, metadata_path, metadata_style) # all lentivirus data (all cell types)
+    elif which == 'lenti': return load_data_lenti(base_path, metadata_path) # all lentivirus data (all cell types)
     elif which == 'application': return load_data_application(base_path, metadata_path, metadata_style) # iPS11 and therapeutic gene transfections
     else: print(f'{which} is not a valid data group.')
 
@@ -912,7 +912,7 @@ def load_data_two_gene(base_path, metadata_path):
     df_quantiles, df_stats = calculate_bins_stats(data[data['gated']], by=['condition','construct','construct2','biorep','exp'])
 
     # Add metadata for construct
-    metadata1 = get_metadata(metadata_path/'construct-metadata.xlsx')
+    metadata1 = get_metadata(metadata_path/'construct-metadata.xlsx', 'designs')
     data = data.merge(metadata1, how='left', on='construct')
     df_quantiles = df_quantiles.merge(metadata1, how='left', on='construct')
     df_stats = df_stats.merge(metadata1, how='left', on='construct')
@@ -930,7 +930,7 @@ def load_data_two_gene(base_path, metadata_path):
     metadata = metadata.merge(metadata2, how='left', on='construct2')
 
     # Create color/marker palettes
-    metadata.loc[metadata['gene']=='1T', 'color'] = colors['teal']
+    metadata.loc[(metadata['gene']=='1T') & (metadata['design']==1), 'color'] = colors['teal']
     metadata.loc[metadata['gene']=='2T', 'color'] = colors['green']
     metadata.loc[metadata['gene']=='2V', 'color'] = colors['purple']
 
@@ -989,7 +989,7 @@ def load_data_lenti(base_path, metadata_path):
     df_quantiles, df_stats = calculate_bins_stats(data[data['gated']], by=['construct','moi','dox','cell','biorep','exp'])
 
     # Add metadata
-    metadata = get_metadata(metadata_path/'construct-metadata.xlsx')
+    metadata = get_metadata(metadata_path/'construct-metadata.xlsx', 'designs')
     data = data.merge(metadata, how='left', on='construct')
     df_quantiles = df_quantiles.merge(metadata, how='left', on='construct')
     df_stats = df_stats.merge(metadata, how='left', on='construct')
