@@ -604,10 +604,11 @@ def load_plates_lenti_tcell(base_path):
     tcell_path = rd.datadir/'instruments'/'data'/'collaborators'/'birnbaum_steph'
 
     plates = pd.DataFrame({
-        'data_path': [tcell_path/'2024-06-10 Galloway Exp 1'/'export', tcell_path/'2024-10-25 Galloway 2'/'export'],
-        'yaml_path': [tcell_path/'2024-06-10 Galloway Exp 1'/'metadata.yaml', tcell_path/'2024-10-25 Galloway 2'/'export'/'metadata.yaml'],
-        'biorep': [1, 2],
-        'exp': ['steph1', 'steph2']
+        'data_path': [tcell_path/'2024-06-10 Galloway Exp 1'/'export', tcell_path/'2024-10-25 Galloway 2'/'export',
+                      tcell_path/'2024-11-06 Galloway 3'/'export'],
+        'yaml_path': [tcell_path/'2024-06-10 Galloway Exp 1'/'metadata.yaml', tcell_path/'2024-10-25 Galloway 2'/'export'/'metadata.yaml',
+                      tcell_path/'2024-11-06 Galloway 3'/'export'/'wells.yaml'],
+        'exp': ['steph1', 'steph2', 'steph3']
     })
     
     # Load data
@@ -615,11 +616,16 @@ def load_plates_lenti_tcell(base_path):
     data = rd.flow.load_groups_with_metadata(plates, columns=channel_list)
 
     # Rename channels
-    d1 = data[data['biorep']==1].copy()
-    d2 = data[data['biorep']==2].copy()
+    d1 = data[data['exp']=='steph1'].copy()
+    d2 = data[data['exp']=='steph2'].copy()
+    d3 = data[data['exp']=='steph3'].copy()
     d1 = d1.rename({'FITC-A': 'mGL-A', 'PE-A': 'mRuby2-A', 'APC-A750-A': 'livedead-A'}, axis=1)
     d2 = d2.rename({'FITC-A': 'mGL-A', 'PE-A': 'mRuby2-A', 'PB450-A': 'livedead-A'}, axis=1)
-    data = pd.concat([d1, d2], ignore_index=True)
+    d3 = d3.rename({'FITC-A': 'mGL-A', 'PE-A': 'mRuby2-A', 'APC-A750-A': 'livedead-A'}, axis=1)
+    d1['biorep'] = 1
+    d2['biorep'] = 2
+
+    data = pd.concat([d1, d2, d3], ignore_index=True)
 
     # Remove negative channel values
     channel_list = ['mGL-A', 'mRuby2-A', 'livedead-A']
@@ -628,13 +634,16 @@ def load_plates_lenti_tcell(base_path):
     # Draw gates
     gates = pd.DataFrame()
     for channel in channel_list:
-        gates[channel] = data[data['construct']=='UT'].groupby(['exp'])[channel].apply(lambda x: x.quantile(0.9999))
+        gates[channel] = data[data['construct']=='UT'].groupby(['exp','biorep'])[channel].apply(lambda x: x.quantile(0.9999))
     gates.reset_index(inplace=True)
 
     # Indicate which channels are relevant for each experiment
-    gates.sort_values(['exp'], inplace=True)
+    gates.sort_values(['biorep'], inplace=True)
     gates['marker'] = 'mGL-A'
     gates['output'] = 'mRuby2-A'
+
+    # Manually adjust marker gates to better isolate expressing population
+    gates['mGL-A'] = [4e4, 4e4, 2e5, 2e5]
 
     # Gate data by marker expression
     data = data.groupby('exp')[data.columns].apply(lambda x: gate_data(x,gates))
