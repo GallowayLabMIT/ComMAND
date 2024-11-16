@@ -155,10 +155,11 @@ def apply_style_designs(metadata):
 
 def apply_style_applications(metadata):
 
-    # Create color palette for comparing promoters
+    # Create color palette for comparing promoters & therapeutic genes
     metadata.loc[(metadata['group']=='marker'), 'color'] = 'black'
     metadata.loc[(metadata['group']=='base'), 'color'] = 'black'
 
+    metadata.loc[(metadata['group']=='controller') & (metadata['promoter']=='CAG'), 'color'] = colors['orange']
     metadata.loc[(metadata['group']=='controller') & (metadata['name'].str.contains('FMRP')), 'color'] = colors['red']
     metadata.loc[(metadata['group']=='controller') & (metadata['name'].str.contains('FXN')), 'color'] = colors['orange']
     metadata.loc[(metadata['group']=='controller') & (metadata['name'].str.contains('Cre')), 'color'] = colors['green']
@@ -506,34 +507,45 @@ def load_plates_two_gene(base_path):
     return data
 
 def load_plates_piggybac(base_path):
-    pb_path = base_path/'kasey'/'2023.07.18_exp63.3-RC'/'export'
-
-    plates = pd.DataFrame({
-        'data_path': [pb_path],
-        'yaml_path': [pb_path/'exp63.3_wells2.yaml'],
-        'biorep': [1],
-        'exp': ['exp63.3-RC']
-    })
+    data_paths = [base_path/'kasey'/'2024.11.07_exp119'/'export', base_path/'kasey'/'2024.11.10_exp119_2'/'export', 
+                  base_path/'kasey'/'2024.11.12_exp119.2'/'export', base_path/'kasey'/'2024.11.14_exp119.3'/'export']
     
+    plates1 = pd.DataFrame({
+        'data_path': data_paths[:2],
+        'yaml_path': [p/'wells.yaml' for p in data_paths[:2]],
+        'exp': ['exp119', 'exp119_2']
+    })
+    plates2 = pd.DataFrame({
+        'data_path': data_paths[2:],
+        'yaml_path': [p/'wells.yaml' for p in data_paths[2:]],
+        'exp': ['exp119.2', 'exp119.3']
+    })
+
     # Load data
     channel_list = ['mRuby2-A','mGL-A']
-    data = rd.flow.load_groups_with_metadata(plates, columns=channel_list)
+    data1 = rd.flow.load_groups_with_metadata(plates1, columns=channel_list)
+    data2 = rd.flow.load_groups_with_metadata(plates2, columns=channel_list+['mCherry-A'])
+    data2.rename(columns={'mRuby2-A': 'YL1-A', 'mCherry-A': 'mRuby2-A'}, inplace=True)
+    data = pd.concat([data1,data2], ignore_index=True)
 
     # Remove negative channel values
     for c in channel_list: data = data[data[c]>0]
 
     # Manually draw gates
-    gates = pd.DataFrame({'exp': ['exp63.3-RC'], 'mGL-A': [200], 'mRuby2-A': [200]})
-
+    gates = pd.DataFrame({
+        'mRuby2-A': [2e2]*4,
+        'mGL-A': [2e2]*4,
+        'exp': ['exp119', 'exp119_2', 'exp119.2', 'exp119.3']
+    })
+    
     # Indicate which channels are relevant for each experiment
-    gates.sort_values(['exp'], inplace=True)
     gates['marker'] = 'mGL-A'
     gates['output'] = 'mRuby2-A'
 
     # Gate data by marker expression
     data = data.groupby('exp')[data.columns].apply(lambda x: gate_data(x,gates))
     data.reset_index(inplace=True, drop=True)
-    data['gated'] = data['expressing'] & (data['construct']!='UT')
+    data['gated'] = data['expressing']
     
     return data
 
@@ -750,16 +762,16 @@ def load_plates_ips11_transfection(base_path):
 
     # Load data
     channel_list = ['mRuby2-A','mGL-A']
-    data = rd.flow.load_groups_with_metadata(plates, columns=channel_list)
+    d = rd.flow.load_groups_with_metadata(plates, columns=channel_list+['YL1-A'])
+    
+    # Rename channels
+    d1 = d[d['exp']=='exp83.5'].copy()
+    d2 = d[d['exp']!='exp83.5'].copy()
+    d2.rename(columns={'YL1-A': 'mRuby2-A', 'mRuby2-A': 'mCherry-A'}, inplace=True)
+    data = pd.concat([d1, d2], ignore_index=True)
     
     # Remove negative channel values
     for c in channel_list: data = data[data[c]>0]
-
-    # Rename channels
-    d1 = data[data['exp']=='exp83.5'].copy()
-    d2 = data[data['exp']!='exp83.5'].copy()
-    d2 = d2.rename(columns={'YL1-A': 'mRuby2-A', 'mRuby2-A': 'mCherry-A'}, inplace=True)
-    data = pd.concat([d1, d2], ignore_index=True)
     
     # Draw gates
     gates = pd.DataFrame()
@@ -824,7 +836,7 @@ def load_data(base_path, metadata_path, which, metadata_style='tuning'):
     elif which == 'plasmid_titration': return load_data_plasmid_titration(base_path, metadata_path)
     elif which == 'miR_characterization': return load_data_miR_characterization(base_path, metadata_path)
     elif which == 'two_gene': return load_data_two_gene(base_path, metadata_path)
-    elif which == 'piggybac': return load_data_piggybac(base_path, metadata_path, metadata_style)
+    elif which == 'piggybac': return load_data_piggybac(base_path, metadata_path)
     elif which == 'lenti': return load_data_lenti(base_path, metadata_path) # all lentivirus data (all cell types)
     elif which == 'application': return load_data_application(base_path, metadata_path) # iPS11 and therapeutic gene transfections
     else: print(f'{which} is not a valid data group.')
@@ -1001,6 +1013,7 @@ def load_data_lenti(base_path, metadata_path):
     fewer_bins = ['neuron','iPS11']
     df_quantiles, df_stats = calculate_bins_stats(data[(data['gated']) & ~(data['cell'].isin(fewer_bins))].copy(), by=['construct','moi','dox','cell','biorep','exp'])
     df_quantiles2, df_stats2 = calculate_bins_stats(data[(data['gated']) & (data['cell'].isin(fewer_bins))].copy(), by=['construct','moi','dox','cell','biorep','exp'], num_bins=10)
+
     quantiles = pd.concat([df_quantiles, df_quantiles2], ignore_index=True)
     stats = pd.concat([df_stats, df_stats2], ignore_index=True)
 
