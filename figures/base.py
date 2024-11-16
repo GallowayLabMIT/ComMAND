@@ -189,10 +189,10 @@ def get_metadata(path, style='tuning'):
     elif style=='applications': return apply_style_applications(metadata)
 
 
-def gate_data(df, gates):
+def gate_data(df, gates, group='exp'):
     df = df.copy()
-    exp = df['exp'].values[0] # the same for entire df, assuming df = data.groupby('exp')
-    gates_dict = gates.set_index('exp').to_dict('dict') # format: column -> {index: value}
+    exp = df[group].values[0] # the same for entire df, assuming df = data.groupby('exp')
+    gates_dict = gates.set_index(group).to_dict('dict') # format: column -> {index: value}
     marker = gates_dict['marker'][exp]
     df['expressing'] = df[marker] > gates_dict[marker][exp]
     df['marker'] = df[marker]
@@ -239,8 +239,6 @@ def calculate_bins_stats(df, by=['construct','exp','biorep'], stat_list=[sp.stat
     # Compute slope
     fits = stats_quantiles.groupby(by)[stats_quantiles.columns].apply(get_slope).reset_index()
     stats = stats.merge(fits, how='left', on=by)
-    #display(fits['intercept_log'].max())
-    #fits['intercept'] = fits['intercept_log'].apply(lambda x: 10**x)
     
     return df_quantiles, stats
 
@@ -556,7 +554,7 @@ def load_plates_lenti_293T_mef(base_path):
             ['plate'+str(i) for i in range(1,10)], 
             (['293T']*3 + ['MEF2A']*3 + ['MEF8A']*3),
             ['P9','P14','P15']*3
-        )]
+    )]
 
     plates = pd.DataFrame({
         'data_path': [base_path_1/'293T_control', 
@@ -658,12 +656,13 @@ def load_plates_lenti_tcell(base_path):
     gates['mGL-A'] = [4e4, 4e4, 2e5, 2e5]
 
     # Gate data by marker expression
-    data = data.groupby('exp')[data.columns].apply(lambda x: gate_data(x,gates))
+    data = data.groupby('biorep')[data.columns].apply(lambda x: gate_data(x,gates,'biorep'))
     data.reset_index(inplace=True, drop=True)
 
     # Gate live cells (livedead-A < manual gate)
-    data.loc[data['biorep']==1, 'live'] = data.loc[data['biorep']==1, 'livedead-A'] < 2e3
-    data.loc[data['biorep']==2, 'live'] = data.loc[data['biorep']==2, 'livedead-A'] < 7e4
+    data.loc[data['biorep']==1, 'live'] = data.loc[data['biorep']==1, 'livedead-A'] < 3e3
+    data.loc[data['biorep']==2, 'live'] = data.loc[data['biorep']==2, 'livedead-A'] < 5e4
+    data.loc[data['biorep']>2, 'live'] = data.loc[data['biorep']>2, 'livedead-A'] < 1e4
 
     data['gated'] = data['expressing'] & data['live'] & (data['construct']!='UT')
     data['cell'] = 'tcell'
@@ -1008,6 +1007,7 @@ def load_data_lenti(base_path, metadata_path):
     
     # Combine data into a single dataframe
     data = pd.concat(data_list, ignore_index=True)
+    data['biorep'] = data['biorep'].astype(int)
 
     # Bin data and calculate statistics
     fewer_bins = ['neuron','iPS11']
