@@ -872,7 +872,7 @@ def load_data_plasmid_titration(base_path, metadata_path):
         data.to_parquet(rd.outfile(cache_path))
 
     # Bin data and calculate statistics
-    df_quantiles, df_stats = calculate_bins_stats(data[data['gated']], by=['construct','amount','exp','biorep'])
+    df_quantiles, df_stats = calculate_bins_stats(data[data['gated']], by=['construct','amount','exp','biorep'], num_bins=10)
 
     # Add metadata
     metadata = get_metadata(metadata_path/'construct-metadata.xlsx')
