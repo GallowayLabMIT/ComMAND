@@ -13,15 +13,28 @@ import pandas as pd
 import scipy as sp
 import seaborn as sns
 
-# Sizes are relevant for paper-size figures
-font_sizes = {
-    'base_size': 8,
-    'smaller_size': 7,
-    'subpanel_label': 10,
-    'poster_base': 16,
-    'poster_subpanel': 24,
+# Font sizes for figures
+font_sizes = {'base_size': 8, 'smaller_size': 7, 'subpanel_label': 10,}
+
+rc_params = {
+    'axes.titlesize': font_sizes['base_size'], 'axes.labelsize': font_sizes['base_size'], 
+    'xtick.labelsize': font_sizes['smaller_size'], 'ytick.labelsize': font_sizes['smaller_size'],
+    'pdf.fonttype': 42, # exports fonts in pdf
+    'xtick.major.size': 3, 'ytick.major.size': 3, 'xtick.minor.size': 2, 'ytick.minor.size': 2, 
+    'xtick.major.pad': 2, 'ytick.major.pad': 2, 'axes.labelpad': 2,
+    'lines.linewidth': 1,
+    'axes.spines.right': False, 'axes.spines.top': False, 
 }
 
+rc_context = {'font.size': font_sizes['base_size'], 'font.family': 'sans-serif', 'font.sans-serif':['Arial']}
+
+# Figure width guidelines from CellPress, in inches
+figure_width = {'full': 6.8504, '1.5-column': 4.48819, '1-column': 3.34646}
+
+# Aesthetics for scatterplots
+scatter_kwargs = dict(s=4, jitter=0.2, linewidth=0.5, edgecolor='white')
+
+# Main color palette
 colors = {
     'red': 'crimson', 'orange': 'darkorange', 'yellow': '#ccb804', 'green': '#78AF56', 'teal': 'teal',
     'blue': '#1650a1', 'purple': '#7A1378', 'pink': 'hotpink', 'black': 'black', 'gray': 'grey',
@@ -301,7 +314,7 @@ def load_plates(data_group, base_path):
     elif data_group == 'lenti_iPS11': return load_plates_lenti_ips11(base_path)
     elif data_group == 'iPS11_transfection': return load_plates_ips11_transfection(base_path)
     elif data_group == 'therapeutic_transfection': return load_plates_therapeutic_transfection(base_path)
-    elif data_group == 'therapeutic_infection': return load_plates_lenti_therapeutic(base_path)
+    elif data_group == 'lenti_therapeutic': return load_plates_lenti_therapeutic(base_path)
     else: print(f'{data_group} is not a valid data group to load plates.')
 
 def load_plates_tuning(base_path):
@@ -826,9 +839,58 @@ def load_plates_therapeutic_transfection(base_path):
     
     return data
 
-# TODO once data collected
 def load_plates_lenti_therapeutic(base_path):
-    return pd.DataFrame()
+    exp_path = base_path/'kasey'/'2024.11.18_exp117.5'/'export'
+    plates = pd.DataFrame({
+        'data_path': [exp_path/'plate1', exp_path/'plate2',],
+        'yaml_path': [exp_path/'plate1'/'wells.yaml', exp_path/'plate2'/'wells.yaml'],
+        'exp': ['exp117.5']*2
+    })
+
+    # Load data
+    channel_list = ['mRuby2-A','mGL-A']
+    data = rd.flow.load_groups_with_metadata(plates, columns=channel_list)
+
+    # Add more metadata
+    data['cell'] = 'therapeutic'
+    data['moi'] = 1
+    data['marker'] = data['mGL-A']
+    data['output'] = data['mRuby2-A']
+
+    # Change output/marker channel labels for FMRP
+    fmrp_list = ['RC262','RC263','RC264', 'RC284','RC285','RC286']
+    data.loc[data['construct'].isin(fmrp_list), 'marker'] = data.loc[data['construct'].isin(fmrp_list), 'mRuby2-A']
+    data.loc[data['construct'].isin(fmrp_list), 'output'] = data.loc[data['construct'].isin(fmrp_list), 'mGL-A']
+    data.loc[data['construct'].isin(fmrp_list), 'exp'] = data.loc[data['construct'].isin(fmrp_list), 'exp'] + '_FMRP'
+
+    # Remove negative channel values
+    for c in channel_list: data = data[data[c]>0]
+
+    # Draw gates
+    gates = pd.DataFrame()
+    for channel in channel_list:
+        gates[channel] = data[data['construct']=='UI'].groupby(['exp'])[channel].apply(lambda x: x.quantile(0.999))
+    gates.reset_index(inplace=True)
+    
+    # Duplicate gates for artificial FMRP "experiment"
+    gates.loc[len(gates.index)] = ['exp117.5_FMRP', gates['mGL-A'].mean(), gates['mRuby2-A'].mean(),] 
+
+    # Adjust marker gate to better isolate infected population
+    gates['mGL-A'] = [2e3]*2
+
+    # Indicate which channels are relevant for each experiment
+    gates.sort_values(['exp'], inplace=True)
+    gates['marker'] = 'mGL-A'
+    gates['output'] = 'mRuby2-A'
+    gates.loc[gates['exp'].str.contains('FMRP'), 'marker'] = 'mRuby2-A'
+    gates.loc[gates['exp'].str.contains('FMRP'), 'output'] = 'mGL-A'
+
+    # Gate data by marker expression
+    data = data.groupby('exp')[data.columns].apply(lambda x: gate_data(x,gates))
+    data.reset_index(inplace=True, drop=True)
+    data['gated'] = data['expressing'] & (data['construct']!='UI')
+    
+    return data
 
 def load_data(base_path, metadata_path, which, metadata_style='tuning'):
     if which == 'tuning': return load_data_tuning(base_path, metadata_path, metadata_style)
@@ -836,7 +898,7 @@ def load_data(base_path, metadata_path, which, metadata_style='tuning'):
     elif which == 'miR_characterization': return load_data_miR_characterization(base_path, metadata_path)
     elif which == 'two_gene': return load_data_two_gene(base_path, metadata_path)
     elif which == 'piggybac': return load_data_piggybac(base_path, metadata_path)
-    elif which == 'lenti': return load_data_lenti(base_path, metadata_path) # all lentivirus data (all cell types)
+    elif which == 'lenti': return load_data_lenti(base_path, metadata_path) # all lentivirus data (all cell types + therapeutic genes)
     elif which == 'application': return load_data_application(base_path, metadata_path) # iPS11 and therapeutic gene transfections
     else: print(f'{which} is not a valid data group.')
 
@@ -993,7 +1055,7 @@ def load_data_piggybac(base_path, metadata_path):
 # Combine data from all lenti experiments
 def load_data_lenti(base_path, metadata_path):
 
-    data_groups = ['lenti_293T_MEF', 'lenti_tcell', 'lenti_neuron', 'lenti_iPS11']
+    data_groups = ['lenti_293T_MEF', 'lenti_tcell', 'lenti_neuron', 'lenti_iPS11', 'lenti_therapeutic']
 
     data_list = []
     for data_group in data_groups:
@@ -1007,8 +1069,7 @@ def load_data_lenti(base_path, metadata_path):
     
     # Combine data into a single dataframe
     data = pd.concat(data_list, ignore_index=True)
-    data['biorep'] = data['biorep'].astype(int)
-
+    
     # Bin data and calculate statistics
     fewer_bins = ['neuron','iPS11']
     df_quantiles, df_stats = calculate_bins_stats(data[(data['gated']) & ~(data['cell'].isin(fewer_bins))].copy(), by=['construct','moi','dox','cell','biorep','exp'])
