@@ -13,15 +13,28 @@ import pandas as pd
 import scipy as sp
 import seaborn as sns
 
-# Sizes are relevant for paper-size figures
-font_sizes = {
-    'base_size': 8,
-    'smaller_size': 7,
-    'subpanel_label': 10,
-    'poster_base': 16,
-    'poster_subpanel': 24,
+# Font sizes for figures
+font_sizes = {'base_size': 8, 'smaller_size': 7, 'subpanel_label': 10,}
+
+rc_params = {
+    'axes.titlesize': font_sizes['base_size'], 'axes.labelsize': font_sizes['base_size'], 
+    'xtick.labelsize': font_sizes['smaller_size'], 'ytick.labelsize': font_sizes['smaller_size'],
+    'pdf.fonttype': 42, # exports fonts in pdf
+    'xtick.major.size': 3, 'ytick.major.size': 3, 'xtick.minor.size': 2, 'ytick.minor.size': 2, 
+    'xtick.major.pad': 2, 'ytick.major.pad': 2, 'axes.labelpad': 2,
+    'lines.linewidth': 1,
+    'axes.spines.right': False, 'axes.spines.top': False, 
 }
 
+rc_context = {'font.size': font_sizes['base_size'], 'font.family': 'sans-serif', 'font.sans-serif':['Arial']}
+
+# Figure width guidelines from CellPress, in inches
+figure_width = {'full': 6.8504, '1.5-column': 4.48819, '1-column': 3.34646}
+
+# Aesthetics for scatterplots
+scatter_kwargs = dict(s=4, jitter=0.2, linewidth=0.5, edgecolor='white')
+
+# Main color palette
 colors = {
     'red': 'crimson', 'orange': 'darkorange', 'yellow': '#ccb804', 'green': '#78AF56', 'teal': 'teal',
     'blue': '#1650a1', 'purple': '#7A1378', 'pink': 'hotpink', 'black': 'black', 'gray': 'grey',
@@ -155,10 +168,11 @@ def apply_style_designs(metadata):
 
 def apply_style_applications(metadata):
 
-    # Create color palette for comparing promoters
+    # Create color palette for comparing promoters & therapeutic genes
     metadata.loc[(metadata['group']=='marker'), 'color'] = 'black'
     metadata.loc[(metadata['group']=='base'), 'color'] = 'black'
 
+    metadata.loc[(metadata['group']=='controller') & (metadata['promoter']=='CAG'), 'color'] = colors['orange']
     metadata.loc[(metadata['group']=='controller') & (metadata['name'].str.contains('FMRP')), 'color'] = colors['red']
     metadata.loc[(metadata['group']=='controller') & (metadata['name'].str.contains('FXN')), 'color'] = colors['orange']
     metadata.loc[(metadata['group']=='controller') & (metadata['name'].str.contains('Cre')), 'color'] = colors['green']
@@ -188,10 +202,10 @@ def get_metadata(path, style='tuning'):
     elif style=='applications': return apply_style_applications(metadata)
 
 
-def gate_data(df, gates):
+def gate_data(df, gates, group='exp'):
     df = df.copy()
-    exp = df['exp'].values[0] # the same for entire df, assuming df = data.groupby('exp')
-    gates_dict = gates.set_index('exp').to_dict('dict') # format: column -> {index: value}
+    exp = df[group].values[0] # the same for entire df, assuming df = data.groupby('exp')
+    gates_dict = gates.set_index(group).to_dict('dict') # format: column -> {index: value}
     marker = gates_dict['marker'][exp]
     df['expressing'] = df[marker] > gates_dict[marker][exp]
     df['marker'] = df[marker]
@@ -238,8 +252,6 @@ def calculate_bins_stats(df, by=['construct','exp','biorep'], stat_list=[sp.stat
     # Compute slope
     fits = stats_quantiles.groupby(by)[stats_quantiles.columns].apply(get_slope).reset_index()
     stats = stats.merge(fits, how='left', on=by)
-    #display(fits['intercept_log'].max())
-    #fits['intercept'] = fits['intercept_log'].apply(lambda x: 10**x)
     
     return df_quantiles, stats
 
@@ -302,7 +314,7 @@ def load_plates(data_group, base_path):
     elif data_group == 'lenti_iPS11': return load_plates_lenti_ips11(base_path)
     elif data_group == 'iPS11_transfection': return load_plates_ips11_transfection(base_path)
     elif data_group == 'therapeutic_transfection': return load_plates_therapeutic_transfection(base_path)
-    elif data_group == 'therapeutic_infection': return load_plates_lenti_therapeutic(base_path)
+    elif data_group == 'lenti_therapeutic': return load_plates_lenti_therapeutic(base_path)
     else: print(f'{data_group} is not a valid data group to load plates.')
 
 def load_plates_tuning(base_path):
@@ -506,34 +518,45 @@ def load_plates_two_gene(base_path):
     return data
 
 def load_plates_piggybac(base_path):
-    pb_path = base_path/'kasey'/'2023.07.18_exp63.3-RC'/'export'
-
-    plates = pd.DataFrame({
-        'data_path': [pb_path],
-        'yaml_path': [pb_path/'exp63.3_wells2.yaml'],
-        'biorep': [1],
-        'exp': ['exp63.3-RC']
-    })
+    data_paths = [base_path/'kasey'/'2024.11.07_exp119'/'export', base_path/'kasey'/'2024.11.10_exp119_2'/'export', 
+                  base_path/'kasey'/'2024.11.12_exp119.2'/'export', base_path/'kasey'/'2024.11.14_exp119.3'/'export']
     
+    plates1 = pd.DataFrame({
+        'data_path': data_paths[:2],
+        'yaml_path': [p/'wells.yaml' for p in data_paths[:2]],
+        'exp': ['exp119', 'exp119_2']
+    })
+    plates2 = pd.DataFrame({
+        'data_path': data_paths[2:],
+        'yaml_path': [p/'wells.yaml' for p in data_paths[2:]],
+        'exp': ['exp119.2', 'exp119.3']
+    })
+
     # Load data
     channel_list = ['mRuby2-A','mGL-A']
-    data = rd.flow.load_groups_with_metadata(plates, columns=channel_list)
+    data1 = rd.flow.load_groups_with_metadata(plates1, columns=channel_list)
+    data2 = rd.flow.load_groups_with_metadata(plates2, columns=channel_list+['mCherry-A'])
+    data2.rename(columns={'mRuby2-A': 'YL1-A', 'mCherry-A': 'mRuby2-A'}, inplace=True)
+    data = pd.concat([data1,data2], ignore_index=True)
 
     # Remove negative channel values
     for c in channel_list: data = data[data[c]>0]
 
     # Manually draw gates
-    gates = pd.DataFrame({'exp': ['exp63.3-RC'], 'mGL-A': [200], 'mRuby2-A': [200]})
-
+    gates = pd.DataFrame({
+        'mRuby2-A': [2e2]*4,
+        'mGL-A': [2e2]*4,
+        'exp': ['exp119', 'exp119_2', 'exp119.2', 'exp119.3']
+    })
+    
     # Indicate which channels are relevant for each experiment
-    gates.sort_values(['exp'], inplace=True)
     gates['marker'] = 'mGL-A'
     gates['output'] = 'mRuby2-A'
 
     # Gate data by marker expression
     data = data.groupby('exp')[data.columns].apply(lambda x: gate_data(x,gates))
     data.reset_index(inplace=True, drop=True)
-    data['gated'] = data['expressing'] & (data['construct']!='UT')
+    data['gated'] = data['expressing']
     
     return data
 
@@ -544,7 +567,7 @@ def load_plates_lenti_293T_mef(base_path):
             ['plate'+str(i) for i in range(1,10)], 
             (['293T']*3 + ['MEF2A']*3 + ['MEF8A']*3),
             ['P9','P14','P15']*3
-        )]
+    )]
 
     plates = pd.DataFrame({
         'data_path': [base_path_1/'293T_control', 
@@ -604,10 +627,11 @@ def load_plates_lenti_tcell(base_path):
     tcell_path = rd.datadir/'instruments'/'data'/'collaborators'/'birnbaum_steph'
 
     plates = pd.DataFrame({
-        'data_path': [tcell_path/'2024-06-10 Galloway Exp 1'/'export', tcell_path/'2024-10-25 Galloway 2'/'export'],
-        'yaml_path': [tcell_path/'2024-06-10 Galloway Exp 1'/'metadata.yaml', tcell_path/'2024-10-25 Galloway 2'/'export'/'metadata.yaml'],
-        'biorep': [1, 2],
-        'exp': ['steph1', 'steph2']
+        'data_path': [tcell_path/'2024-06-10 Galloway Exp 1'/'export', tcell_path/'2024-10-25 Galloway 2'/'export',
+                      tcell_path/'2024-11-06 Galloway 3'/'export'],
+        'yaml_path': [tcell_path/'2024-06-10 Galloway Exp 1'/'metadata.yaml', tcell_path/'2024-10-25 Galloway 2'/'export'/'metadata.yaml',
+                      tcell_path/'2024-11-06 Galloway 3'/'export'/'wells.yaml'],
+        'exp': ['steph1', 'steph2', 'steph3']
     })
     
     # Load data
@@ -615,11 +639,16 @@ def load_plates_lenti_tcell(base_path):
     data = rd.flow.load_groups_with_metadata(plates, columns=channel_list)
 
     # Rename channels
-    d1 = data[data['biorep']==1].copy()
-    d2 = data[data['biorep']==2].copy()
+    d1 = data[data['exp']=='steph1'].copy()
+    d2 = data[data['exp']=='steph2'].copy()
+    d3 = data[data['exp']=='steph3'].copy()
     d1 = d1.rename({'FITC-A': 'mGL-A', 'PE-A': 'mRuby2-A', 'APC-A750-A': 'livedead-A'}, axis=1)
     d2 = d2.rename({'FITC-A': 'mGL-A', 'PE-A': 'mRuby2-A', 'PB450-A': 'livedead-A'}, axis=1)
-    data = pd.concat([d1, d2], ignore_index=True)
+    d3 = d3.rename({'FITC-A': 'mGL-A', 'PE-A': 'mRuby2-A', 'APC-A750-A': 'livedead-A'}, axis=1)
+    d1['biorep'] = 1
+    d2['biorep'] = 2
+
+    data = pd.concat([d1, d2, d3], ignore_index=True)
 
     # Remove negative channel values
     channel_list = ['mGL-A', 'mRuby2-A', 'livedead-A']
@@ -628,23 +657,28 @@ def load_plates_lenti_tcell(base_path):
     # Draw gates
     gates = pd.DataFrame()
     for channel in channel_list:
-        gates[channel] = data[data['construct']=='UT'].groupby(['exp'])[channel].apply(lambda x: x.quantile(0.9999))
+        gates[channel] = data[data['construct']=='UT'].groupby(['exp','biorep'])[channel].apply(lambda x: x.quantile(0.9999))
     gates.reset_index(inplace=True)
 
     # Indicate which channels are relevant for each experiment
-    gates.sort_values(['exp'], inplace=True)
+    gates.sort_values(['biorep'], inplace=True)
     gates['marker'] = 'mGL-A'
     gates['output'] = 'mRuby2-A'
 
+    # Manually adjust marker gates to better isolate expressing population
+    gates['mGL-A'] = [4e4, 4e4, 2e5, 2e5]
+
     # Gate data by marker expression
-    data = data.groupby('exp')[data.columns].apply(lambda x: gate_data(x,gates))
+    data = data.groupby('biorep')[data.columns].apply(lambda x: gate_data(x,gates,'biorep'))
     data.reset_index(inplace=True, drop=True)
 
     # Gate live cells (livedead-A < manual gate)
-    data.loc[data['biorep']==1, 'live'] = data.loc[data['biorep']==1, 'livedead-A'] < 2e3
-    data.loc[data['biorep']==2, 'live'] = data.loc[data['biorep']==2, 'livedead-A'] < 7e4
+    data.loc[data['biorep']==1, 'live'] = data.loc[data['biorep']==1, 'livedead-A'] < 3e3
+    data.loc[data['biorep']==2, 'live'] = data.loc[data['biorep']==2, 'livedead-A'] < 5e4
+    data.loc[data['biorep']>2, 'live'] = data.loc[data['biorep']>2, 'livedead-A'] < 1e4
 
     data['gated'] = data['expressing'] & data['live'] & (data['construct']!='UT')
+    data['cell'] = 'tcell'
     
     return data
 
@@ -701,6 +735,8 @@ def load_plates_lenti_ips11(base_path):
 
     # Add more metadata
     data['exp'] = 'exp116_' + data['biorep'].astype(str)
+    data['cell'] = 'iPS11'
+    data['moi'] = 1
 
     # Remove negative channel values
     for c in channel_list: data = data[data[c]>0]
@@ -738,16 +774,16 @@ def load_plates_ips11_transfection(base_path):
 
     # Load data
     channel_list = ['mRuby2-A','mGL-A']
-    data = rd.flow.load_groups_with_metadata(plates, columns=channel_list)
+    d = rd.flow.load_groups_with_metadata(plates, columns=channel_list+['YL1-A'])
+    
+    # Rename channels
+    d1 = d[d['exp']=='exp83.5'].copy()
+    d2 = d[d['exp']!='exp83.5'].copy()
+    d2.rename(columns={'YL1-A': 'mRuby2-A', 'mRuby2-A': 'mCherry-A'}, inplace=True)
+    data = pd.concat([d1, d2], ignore_index=True)
     
     # Remove negative channel values
     for c in channel_list: data = data[data[c]>0]
-
-    # Rename channels
-    d1 = data[data['exp']=='exp83.5'].copy()
-    d2 = data[data['exp']!='exp83.5'].copy()
-    d2 = d2.rename(columns={'YL1-A': 'mRuby2-A', 'mRuby2-A': 'mCherry-A'}, inplace=True)
-    data = pd.concat([d1, d2], ignore_index=True)
     
     # Draw gates
     gates = pd.DataFrame()
@@ -803,18 +839,67 @@ def load_plates_therapeutic_transfection(base_path):
     
     return data
 
-# TODO once data collected
 def load_plates_lenti_therapeutic(base_path):
-    return pd.DataFrame()
+    exp_path = base_path/'kasey'/'2024.11.18_exp117.5'/'export'
+    plates = pd.DataFrame({
+        'data_path': [exp_path/'plate1', exp_path/'plate2',],
+        'yaml_path': [exp_path/'plate1'/'wells.yaml', exp_path/'plate2'/'wells.yaml'],
+        'exp': ['exp117.5']*2
+    })
+
+    # Load data
+    channel_list = ['mRuby2-A','mGL-A']
+    data = rd.flow.load_groups_with_metadata(plates, columns=channel_list)
+
+    # Add more metadata
+    data['cell'] = 'therapeutic'
+    data['moi'] = 1
+    data['marker'] = data['mGL-A']
+    data['output'] = data['mRuby2-A']
+
+    # Change output/marker channel labels for FMRP
+    fmrp_list = ['RC262','RC263','RC264', 'RC284','RC285','RC286']
+    data.loc[data['construct'].isin(fmrp_list), 'marker'] = data.loc[data['construct'].isin(fmrp_list), 'mRuby2-A']
+    data.loc[data['construct'].isin(fmrp_list), 'output'] = data.loc[data['construct'].isin(fmrp_list), 'mGL-A']
+    data.loc[data['construct'].isin(fmrp_list), 'exp'] = data.loc[data['construct'].isin(fmrp_list), 'exp'] + '_FMRP'
+
+    # Remove negative channel values
+    for c in channel_list: data = data[data[c]>0]
+
+    # Draw gates
+    gates = pd.DataFrame()
+    for channel in channel_list:
+        gates[channel] = data[data['construct']=='UI'].groupby(['exp'])[channel].apply(lambda x: x.quantile(0.999))
+    gates.reset_index(inplace=True)
+    
+    # Duplicate gates for artificial FMRP "experiment"
+    gates.loc[len(gates.index)] = ['exp117.5_FMRP', gates['mGL-A'].mean(), gates['mRuby2-A'].mean(),] 
+
+    # Adjust marker gate to better isolate infected population
+    gates['mGL-A'] = [2e3]*2
+
+    # Indicate which channels are relevant for each experiment
+    gates.sort_values(['exp'], inplace=True)
+    gates['marker'] = 'mGL-A'
+    gates['output'] = 'mRuby2-A'
+    gates.loc[gates['exp'].str.contains('FMRP'), 'marker'] = 'mRuby2-A'
+    gates.loc[gates['exp'].str.contains('FMRP'), 'output'] = 'mGL-A'
+
+    # Gate data by marker expression
+    data = data.groupby('exp')[data.columns].apply(lambda x: gate_data(x,gates))
+    data.reset_index(inplace=True, drop=True)
+    data['gated'] = data['expressing'] & (data['construct']!='UI')
+    
+    return data
 
 def load_data(base_path, metadata_path, which, metadata_style='tuning'):
     if which == 'tuning': return load_data_tuning(base_path, metadata_path, metadata_style)
     elif which == 'plasmid_titration': return load_data_plasmid_titration(base_path, metadata_path)
     elif which == 'miR_characterization': return load_data_miR_characterization(base_path, metadata_path)
-    elif which == 'two_gene': return load_data_two_gene(base_path, metadata_path, metadata_style)
-    elif which == 'piggybac': return load_data_piggybac(base_path, metadata_path, metadata_style)
-    elif which == 'lenti': return load_data_lenti(base_path, metadata_path, metadata_style) # all lentivirus data (all cell types)
-    elif which == 'application': return load_data_application(base_path, metadata_path, metadata_style) # iPS11 and therapeutic gene transfections
+    elif which == 'two_gene': return load_data_two_gene(base_path, metadata_path)
+    elif which == 'piggybac': return load_data_piggybac(base_path, metadata_path)
+    elif which == 'lenti': return load_data_lenti(base_path, metadata_path) # all lentivirus data (all cell types + therapeutic genes)
+    elif which == 'application': return load_data_application(base_path, metadata_path) # iPS11 and therapeutic gene transfections
     else: print(f'{which} is not a valid data group.')
 
 def load_data_tuning(base_path, metadata_path, metadata_style):
@@ -849,7 +934,7 @@ def load_data_plasmid_titration(base_path, metadata_path):
         data.to_parquet(rd.outfile(cache_path))
 
     # Bin data and calculate statistics
-    df_quantiles, df_stats = calculate_bins_stats(data[data['gated']], by=['construct','amount','exp','biorep'])
+    df_quantiles, df_stats = calculate_bins_stats(data[data['gated']], by=['construct','amount','exp','biorep'], num_bins=10)
 
     # Add metadata
     metadata = get_metadata(metadata_path/'construct-metadata.xlsx')
@@ -912,7 +997,7 @@ def load_data_two_gene(base_path, metadata_path):
     df_quantiles, df_stats = calculate_bins_stats(data[data['gated']], by=['condition','construct','construct2','biorep','exp'])
 
     # Add metadata for construct
-    metadata1 = get_metadata(metadata_path/'construct-metadata.xlsx')
+    metadata1 = get_metadata(metadata_path/'construct-metadata.xlsx', 'designs')
     data = data.merge(metadata1, how='left', on='construct')
     df_quantiles = df_quantiles.merge(metadata1, how='left', on='construct')
     df_stats = df_stats.merge(metadata1, how='left', on='construct')
@@ -925,8 +1010,24 @@ def load_data_two_gene(base_path, metadata_path):
 
     # Combine metadata
     metadata = data.drop_duplicates('condition')[['construct','construct2','condition']]
+    metadata.dropna(inplace=True)
     metadata = metadata.merge(metadata1, how='left', on='construct')
     metadata = metadata.merge(metadata2, how='left', on='construct2')
+
+    # Create color/marker palettes
+    metadata.loc[(metadata['gene']=='1T') & (metadata['design']==1), 'color'] = colors['teal']
+    metadata.loc[metadata['gene']=='2T', 'color'] = colors['green']
+    metadata.loc[metadata['gene']=='2V', 'color'] = colors['purple']
+
+    # markers
+    metadata['markers'] = 'X'
+    metadata.loc[metadata['gene']=='1T', 'markers'] = 'o'
+    metadata.loc[metadata['gene']=='2T', 'markers'] = 'D'
+    metadata.loc[metadata['gene']=='2V', 'markers'] = 's'
+
+    ts_label = {'na': 'base', 'NT': 'OL', 'T': 'CL', 'none': '–'}
+    metadata['ts_label'] = metadata['ts_kind'].replace(ts_label)
+    metadata['kind'] = metadata['gene'] + '_' + metadata['design'].astype(int).astype(str)
 
     return data, df_quantiles, df_stats, metadata
 
@@ -954,7 +1055,7 @@ def load_data_piggybac(base_path, metadata_path):
 # Combine data from all lenti experiments
 def load_data_lenti(base_path, metadata_path):
 
-    data_groups = ['lenti_293T_MEF', 'lenti_tcell', 'lenti_neuron', 'lenti_iPS11']
+    data_groups = ['lenti_293T_MEF', 'lenti_tcell', 'lenti_neuron', 'lenti_iPS11', 'lenti_therapeutic']
 
     data_list = []
     for data_group in data_groups:
@@ -968,17 +1069,22 @@ def load_data_lenti(base_path, metadata_path):
     
     # Combine data into a single dataframe
     data = pd.concat(data_list, ignore_index=True)
-
+    
     # Bin data and calculate statistics
-    df_quantiles, df_stats = calculate_bins_stats(data[data['gated']], by=['construct','moi','dox','cell','biorep','exp'])
+    fewer_bins = ['neuron','iPS11']
+    df_quantiles, df_stats = calculate_bins_stats(data[(data['gated']) & ~(data['cell'].isin(fewer_bins))].copy(), by=['construct','moi','dox','cell','biorep','exp'])
+    df_quantiles2, df_stats2 = calculate_bins_stats(data[(data['gated']) & (data['cell'].isin(fewer_bins))].copy(), by=['construct','moi','dox','cell','biorep','exp'], num_bins=10)
+
+    quantiles = pd.concat([df_quantiles, df_quantiles2], ignore_index=True)
+    stats = pd.concat([df_stats, df_stats2], ignore_index=True)
 
     # Add metadata
-    metadata = get_metadata(metadata_path/'construct-metadata.xlsx')
+    metadata = get_metadata(metadata_path/'construct-metadata.xlsx', 'designs')
     data = data.merge(metadata, how='left', on='construct')
-    df_quantiles = df_quantiles.merge(metadata, how='left', on='construct')
-    df_stats = df_stats.merge(metadata, how='left', on='construct')
+    quantiles = quantiles.merge(metadata, how='left', on='construct')
+    stats = stats.merge(metadata, how='left', on='construct')
 
-    return data, df_quantiles, df_stats, metadata
+    return data, quantiles, stats, metadata
 
 # Combine data from application-relevant transfections
 def load_data_application(base_path, metadata_path):
@@ -1000,7 +1106,7 @@ def load_data_application(base_path, metadata_path):
     data = pd.concat(data_list, ignore_index=True)
 
     # Add metadata
-    metadata = get_metadata(metadata_path/'construct-metadata.xlsx')
+    metadata = get_metadata(metadata_path/'construct-metadata.xlsx', 'applications')
     data = data.merge(metadata, how='left', on='construct')
     data = data[~data['construct'].isna()]
     
@@ -1009,7 +1115,6 @@ def load_data_application(base_path, metadata_path):
 
     # Bin data and calculate statistics
     df_quantiles, df_stats = calculate_bins_stats(data[data['gated']], by=['data_group','construct','biorep','exp'])
-    df_quantiles = df_quantiles.merge(metadata, how='left', on='construct')
     df_stats = df_stats.merge(metadata, how='left', on='construct')
 
     return data, df_quantiles, df_stats, metadata
@@ -1068,8 +1173,9 @@ def load_modeling_stochastic_sims(base_path):
     data['design'] = data['design'].map({'Design 1': 1, 'Design 2': 2, 'Design 3': 3,
                                             'Dual Vector': 0, 'Dual Transcript': 0})
     data['kind'] = data['gene'] + '_' + data['design'].astype(str)
-    
+    data['condition'] = data['gene']+ '_' + data['moi'].astype(str)
+
     # Bin data and calculate statistics
-    _, df_stats = calculate_bins_stats(data, by=['design','moi','risc','gene','kind'])
+    _, df_stats = calculate_bins_stats(data, by=['condition','design','moi','risc','gene','kind'])
 
     return data, df_stats
