@@ -117,3 +117,29 @@ def calculate_bins_stats(df, by=['construct','exp','biorep'], stat_list=[sp.stat
     #fits['intercept'] = fits['intercept_log'].apply(lambda x: 10**x)
     
     return df_quantiles, stats, stats_quantiles, fits
+
+def load_data_qpcr(groups_df):
+    group_list = []
+    for group in groups_df.to_dict(orient="index").values():
+
+        # Load data in group
+        group_data = pd.read_csv(group['data_path'], sep='\t', header=1, usecols=['Pos','Cp'])
+        group_data.rename(columns={'Pos': 'well'}, inplace=True)
+
+        # Add associated metadata (not paths)
+        for k, v in group.items():
+            if not (k == "data_path") and not (k == "yaml_path"):
+                group_data[k] = v
+
+        # Add well metadata
+        metadata = pd.DataFrame.from_dict(rd.flow.load_well_metadata(group['yaml_path']))
+        metadata.reset_index(names='well', inplace=True)
+        group_data = group_data.merge(metadata, how='left', on='well',)
+
+        group_list.append(group_data)
+
+    # Concatenate all the data into a single DataFrame
+    data = pd.concat(group_list, ignore_index=True).replace(np.NaN, pd.NA)
+    data.dropna(subset='Cp', inplace=True)
+
+    return data
