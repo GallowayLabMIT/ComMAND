@@ -32,7 +32,7 @@ rc_context = {'font.size': font_sizes['base_size'], 'font.family': 'sans-serif',
 figure_width = {'full': 6.8504, '1.5-column': 4.48819, '1-column': 3.34646}
 
 # Aesthetics for scatterplots
-scatter_kwargs = dict(s=4, jitter=0.2, linewidth=0.5, edgecolor='white')
+scatter_kwargs = dict(s=4, jitter=0.2, linewidth=0.5, edgecolor='white', legend=False,)
 
 # Main color palette
 colors = {
@@ -196,6 +196,8 @@ def get_metadata(path, style='tuning'):
 
     metadata['color'] = metadata['group'].replace(group_palette)
     metadata['markers'] = 'o' #metadata['group'].replace(group_markers)
+    metadata['ts_label'] = metadata['ts_kind'].replace({'na': 'base', 'NT': 'OL', 'T': 'CL', 'none': '–'})
+
     if style=='tuning': return apply_style_tuning(metadata)
     elif style=='promoters': return apply_style_promoters(metadata)
     elif style=='designs': return apply_style_designs(metadata)
@@ -290,6 +292,10 @@ def get_slope_instant(df, x, y):
     d = df.sort_values(x)
     return (list(d[y])[-1] - list(d[y])[-2]) / (list(d[x])[-1] - list(d[x])[-2])
 
+def get_housekeeping(df, gene='GAPDH', stat=np.median):
+    df['housekeeping_Cp'] = df.loc[df['primers']=='GAPDH', 'Cp'].agg(stat)
+    return df
+
 def modify_norm_factor(df):
     param = df['param'].values[0]
     d = df.copy()
@@ -315,6 +321,7 @@ def load_plates(data_group, base_path):
     elif data_group == 'iPS11_transfection': return load_plates_ips11_transfection(base_path)
     elif data_group == 'therapeutic_transfection': return load_plates_therapeutic_transfection(base_path)
     elif data_group == 'lenti_therapeutic': return load_plates_lenti_therapeutic(base_path)
+    elif data_group == 'qPCR': return load_plates_qpcr(base_path)
     else: print(f'{data_group} is not a valid data group to load plates.')
 
 def load_plates_tuning(base_path):
@@ -892,6 +899,40 @@ def load_plates_lenti_therapeutic(base_path):
     
     return data
 
+# ignore base_path for just this one right now, will change later
+def load_plates_qpcr(base_path):
+    base_path = rd.datadir/'instruments'/'data'/'qPCR'/'emma'/'command'/'2024.11.13_command'
+    plates = pd.DataFrame({
+        'data_path': [base_path/'2024.11.13_ELP_command_qPCR_Cp.txt'],
+        'yaml_path': [base_path/'wells.yaml'],
+        'biorep': [1]
+    })
+
+    group_list = []
+    for group in plates.to_dict(orient="index").values():
+
+        # Load data in group
+        group_data = pd.read_csv(group['data_path'], sep='\t', header=1, usecols=['Pos','Cp'])
+        group_data.rename(columns={'Pos': 'well'}, inplace=True)
+
+        # Add associated metadata from `plates` (not paths)
+        for k, v in group.items():
+            if not (k == "data_path") and not (k == "yaml_path"):
+                group_data[k] = v
+
+        # Add well metadata
+        metadata = pd.DataFrame.from_dict(rd.flow.load_well_metadata(group['yaml_path']))
+        metadata.reset_index(names='well', inplace=True)
+        group_data = group_data.merge(metadata, how='left', on='well',)
+
+        group_list.append(group_data)
+
+    # Concatenate all the data into a single DataFrame
+    data = pd.concat(group_list, ignore_index=True).replace(np.NaN, pd.NA)
+    data.dropna(subset='Cp', inplace=True)
+
+    return data
+
 def load_data(base_path, metadata_path, which, metadata_style='tuning'):
     if which == 'tuning': return load_data_tuning(base_path, metadata_path, metadata_style)
     elif which == 'plasmid_titration': return load_data_plasmid_titration(base_path, metadata_path)
@@ -900,6 +941,7 @@ def load_data(base_path, metadata_path, which, metadata_style='tuning'):
     elif which == 'piggybac': return load_data_piggybac(base_path, metadata_path)
     elif which == 'lenti': return load_data_lenti(base_path, metadata_path) # all lentivirus data (all cell types + therapeutic genes)
     elif which == 'application': return load_data_application(base_path, metadata_path) # iPS11 and therapeutic gene transfections
+    elif which == 'qPCR': return load_data_qpcr(base_path, metadata_path)
     else: print(f'{which} is not a valid data group.')
 
 def load_data_tuning(base_path, metadata_path, metadata_style):
@@ -1118,6 +1160,33 @@ def load_data_application(base_path, metadata_path):
     df_stats = df_stats.merge(metadata, how='left', on='construct')
 
     return data, df_quantiles, df_stats, metadata
+
+def load_data_qpcr(base_path, metadata_path):
+
+    # Load raw (Cp) data
+    cache_path = rd.rootdir/'data'/'qPCR.gzip'
+    data = pd.DataFrame()
+    if cache_path.is_file(): data = pd.read_parquet(cache_path)
+    else: 
+        data = load_plates('qPCR', base_path)
+        data.to_parquet(rd.outfile(cache_path))
+
+    # Add metadata
+    metadata = get_metadata(metadata_path/'construct-metadata.xlsx', 'applications')
+    data = data.merge(metadata, how='left', on='construct')
+
+    # Normalize expression to housekeeping gene (GAPDH)
+    data = data.groupby(['dox','construct','biorep'])[data.columns].apply(get_housekeeping).reset_index(drop=True)
+    data['delta_Cp'] = data['Cp'] - data['housekeeping_Cp']
+    data['expression'] = data['Cp'].apply(lambda x: 2**(-x))
+    data['norm_expression'] = data['delta_Cp'].apply(lambda x: 2**(-x))
+
+    # Calculate stats (combine technical replicates into one value per biorep)
+    # Calculate stats for bioreps
+    stats = data.groupby(['construct','dox','primers','biorep'])[['Cp','housekeeping_Cp','delta_Cp','expression','norm_expression']].median().reset_index()
+    stats = stats.merge(metadata, how='left', on='construct')
+    
+    return data, stats, metadata
 
 # Load modeling results
 def load_modeling(base_path, which):
