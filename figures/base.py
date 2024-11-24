@@ -296,6 +296,10 @@ def get_housekeeping(df, gene='GAPDH', stat=np.median):
     df['housekeeping_Cp'] = df.loc[df['primers']=='GAPDH', 'Cp'].agg(stat)
     return df
 
+def get_control(df, construct='UI', stat=np.median):
+    df[construct+'_Cp'] = df.loc[(df['construct']==construct), 'delta_Cp'].agg(stat)
+    return df
+
 def modify_norm_factor(df):
     param = df['param'].values[0]
     d = df.copy()
@@ -901,11 +905,10 @@ def load_plates_lenti_therapeutic(base_path):
 
 # ignore base_path for just this one right now, will change later
 def load_plates_qpcr(base_path):
-    base_path = rd.datadir/'instruments'/'data'/'qPCR'/'emma'/'command'/'2024.11.13_command'
+    base_path = rd.datadir/'instruments'/'data'/'qPCR'/'emma'/'command'
     plates = pd.DataFrame({
-        'data_path': [base_path/'2024.11.13_ELP_command_qPCR_Cp.txt'],
-        'yaml_path': [base_path/'wells.yaml'],
-        'biorep': [1]
+        'data_path': [base_path/'2024.11.13_command'/'2024.11.13_ELP_command_qPCR_Cp.txt', base_path/'2024.11.22_command'/'2024.11.22_ELP_command_qPCR_Cp.txt'],
+        'yaml_path': [base_path/'2024.11.13_command'/'wells.yaml', base_path/'2024.11.22_command'/'wells.yaml'],
     })
 
     group_list = []
@@ -1181,9 +1184,16 @@ def load_data_qpcr(base_path, metadata_path):
     data['expression'] = data['Cp'].apply(lambda x: 2**(-x))
     data['norm_expression'] = data['delta_Cp'].apply(lambda x: 2**(-x))
 
+    # Compute expression relative to base gene construct
+    data = data.groupby(['dox','primers','biorep'])[data.columns].apply(lambda x: get_control(x, 'RC281')).reset_index(drop=True)
+    data = data.groupby(['dox','primers','biorep'])[data.columns].apply(lambda x: get_control(x, 'RC284')).reset_index(drop=True)
+    data['delta_delta_Cp'] = data['delta_Cp'] - data['RC281_Cp']
+    data.loc[data['construct'].isin(['RC284','RC285','RC286']), 'delta_delta_Cp'] = data.loc[data['construct'].isin(['RC284','RC285','RC286']), 'delta_Cp'] - data.loc[data['construct'].isin(['RC284','RC285','RC286']), 'RC284_Cp']
+    data['relative_expression'] = data['delta_delta_Cp'].apply(lambda x: 2**(-x))
+
     # Calculate stats (combine technical replicates into one value per biorep)
     # Calculate stats for bioreps
-    stats = data.groupby(['construct','dox','primers','biorep'])[['Cp','housekeeping_Cp','delta_Cp','expression','norm_expression']].median().reset_index()
+    stats = data.groupby(['construct','dox','primers','biorep'])[['Cp','housekeeping_Cp','delta_Cp','expression','norm_expression','relative_expression']].median().reset_index()
     stats = stats.merge(metadata, how='left', on='construct')
     
     return data, stats, metadata
