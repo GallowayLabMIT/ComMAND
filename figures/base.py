@@ -218,9 +218,9 @@ def rename_multilevel_cols(index):
     if index[1] == '': return index[0]
     else: return index[0] + '_' + index[1]
 
-def get_slope(df):
-    slope, intercept, r_value, p_value, stderr = sp.stats.linregress(df['bin_marker_quantiles_median_log'], df['output_gmean_log'])
-    result = pd.DataFrame(columns=['slope', 'intercept_log', 'r_value', 'p_value', 'stderr'])
+def get_slope(df, x='bin_marker_quantiles_median_log', y='output_gmean_log'):
+    slope, intercept, r_value, p_value, stderr = sp.stats.linregress(df[x], df[y])
+    result = pd.DataFrame(columns=['slope', 'intercept', 'r_value', 'p_value', 'stderr'])
     result.loc[len(result.index)] = [slope, intercept, r_value, p_value, stderr]
     return result
 
@@ -1192,6 +1192,7 @@ def load_data_qpcr(base_path, metadata_path):
 def load_modeling(base_path, which):
     if which == 'param_sweeps': return load_modeling_param_sweeps(base_path)
     elif which == 'stochastic_sims': return load_modeling_stochastic_sims(base_path)
+    elif which == 'missplicing': return load_modeling_missplicing(base_path)
     else: print(f'{which} is not a valid modeling type.')
 
 # later: move modeling results to different location
@@ -1246,5 +1247,30 @@ def load_modeling_stochastic_sims(base_path):
 
     # Bin data and calculate statistics
     _, df_stats = calculate_bins_stats(data, by=['condition','design','moi','risc','gene','kind'])
+
+    return data, df_stats
+
+# later: move modeling results to different location
+#   current base_path = rd.rootdir/'output'
+def load_modeling_missplicing(base_path):
+
+    # Load stochastic simulations
+    simulation_path = base_path/'modeling'/'julia_missplicing_simulations'
+    data_list = []
+    for model in ['base', 'more_miRNA', 'more_mRNA']:
+        if (simulation_path/('stochastic_sims_'+model+'.gzip')).is_file(): 
+            d = pd.read_parquet(simulation_path/('stochastic_sims_'+model+'.gzip'))
+            d['model'] = model
+            data_list.append(d)
+    
+    # Combine data into a single dataframe
+    data = pd.concat(data_list, ignore_index=True)
+
+    # Rename columns/labels to match those for experimental data
+    data.rename(columns={'copynum': 'copy_num', 'reg_gene': 'output', 'unreg_gene': 'marker'}, inplace=True)
+    data['condition'] = data['model']+ '_' + data['moi'].astype(str)
+
+    # Bin data and calculate statistics
+    _, df_stats = calculate_bins_stats(data, by=['model','condition','risc','moi'])
 
     return data, df_stats
