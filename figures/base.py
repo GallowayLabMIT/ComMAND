@@ -31,8 +31,9 @@ rc_context = {'font.size': font_sizes['base_size'], 'font.family': 'sans-serif',
 # Figure width guidelines from CellPress, in inches
 figure_width = {'full': 6.8504, '1.5-column': 4.48819, '1-column': 3.34646}
 
-# Aesthetics for scatterplots
+# Aesthetics for plotting
 scatter_kwargs = dict(s=4, jitter=0.2, linewidth=0.5, edgecolor='white', legend=False,)
+annotate_kwargs = dict(test='t-test_ind', text_format='star', loc='inside', line_height=0, line_width=0.5, text_offset=-2)
 
 # Main color palette
 colors = {
@@ -697,14 +698,13 @@ def load_plates_lenti_neuron(base_path):
     neuron_path = base_path/'chris'/'2024.06.15-rat-neurons'
 
     plates = pd.DataFrame({
-        'data_path': [neuron_path/'export'],
-        'yaml_path': [neuron_path/'metadata.yaml'],
-        'biorep': [1],
-        'exp': ['exp098'],
-        'cell': ['neuron'],
-        'dox': [1000]
+        'data_path': [base_path/'chris'/'2024.06.15-rat-neurons'/'export', base_path/'kasey'/'2024.11.12_exp098.2'/'export', base_path/'kasey'/'2024.11.23_exp098.4'/'export'],
+        'yaml_path': [base_path/'chris'/'2024.06.15-rat-neurons'/'metadata.yaml', base_path/'kasey'/'2024.11.12_exp098.2'/'export'/'wells.yaml', base_path/'kasey'/'2024.11.23_exp098.4'/'export'/'wells.yaml'],
+        'exp': ['exp098', 'exp098.2', 'exp098.4'],
+        'cell': ['neuron']*3,
+        'dox': [1000]*3
     })
-    
+
     # Load data
     channel_list = ['mRuby2-A','mGL-A']
     data = rd.flow.load_groups_with_metadata(plates, columns=channel_list)
