@@ -293,12 +293,28 @@ def get_slope_instant(df, x, y):
     d = df.sort_values(x)
     return (list(d[y])[-1] - list(d[y])[-2]) / (list(d[x])[-1] - list(d[x])[-2])
 
-def get_housekeeping(df, gene='GAPDH', stat=np.median):
-    df['housekeeping_Cp'] = df.loc[df['primers']=='GAPDH', 'Cp'].agg(stat)
+# Get GAPDH Cp
+def get_housekeeping_qpcr(df, housekeeping='GAPDH'):
+    value = df.loc[df['primers']==housekeeping, 'Cp']
+    if value.empty: result = pd.NA
+    else: result = value.median()
+    df[housekeeping+'_Cp'] = result
     return df
 
-def get_control(df, construct='UI', stat=np.median):
-    df[construct+'_Cp'] = df.loc[(df['construct']==construct), 'delta_Cp'].agg(stat)
+# Get Cp of negative controls (no-cDNA, no-RT)
+def get_negative_qpcr(df):
+    value = df.loc[df['construct'].isin(['no-RT','no-cDNA']), 'Cp']
+    if value.empty: result = 35
+    else: result = value.median()
+    df['negative_Cp'] = result
+    return df
+
+# Get base gene delta_Cp
+def get_control_qpcr(df):
+    value = df.loc[df['group']=='base', 'delta_Cp']
+    if value.empty: result = pd.NA
+    else: result = value.values[0]
+    df['base_delta_Cp'] = result
     return df
 
 def modify_norm_factor(df):
@@ -907,8 +923,9 @@ def load_plates_lenti_therapeutic(base_path):
 def load_plates_qpcr(base_path):
     base_path = rd.datadir/'instruments'/'data'/'qPCR'/'emma'/'command'
     plates = pd.DataFrame({
-        'data_path': [base_path/'2024.11.13_command'/'2024.11.13_ELP_command_qPCR_Cp.txt', base_path/'2024.11.22_command'/'2024.11.22_ELP_command_qPCR_Cp.txt'],
-        'yaml_path': [base_path/'2024.11.13_command'/'wells.yaml', base_path/'2024.11.22_command'/'wells.yaml'],
+        'data_path': [base_path/'2024.11.13_command'/'2024.11.13_ELP_command_qPCR_Cp.txt', base_path/'2024.11.22_command'/'2024.11.22_ELP_command_qPCR_Cp.txt', base_path/'2024.12.03_command'/'2024.12.03_ELP_command_qPCR_Cp.txt'],
+        'yaml_path': [base_path/'2024.11.13_command'/'wells.yaml', base_path/'2024.11.22_command'/'wells.yaml', base_path/'2024.12.03_command'/'wells.yaml'],
+        'exp': ['exp123', 'exp123.2', 'exp123.4']
     })
 
     group_list = []
@@ -1174,29 +1191,54 @@ def load_data_qpcr(base_path, metadata_path):
         data = load_plates('qPCR', base_path)
         data.to_parquet(rd.outfile(cache_path))
 
+    # Remove points (biorep + construct + primers + technical rep) where Cp = 35 
+    # (poor amplification, due technical outliers or zero expression conditions)
+    # Also, ignore -dox conditions
+    print('Remove technical reps with Cp=35')
+    display(data[(data['Cp']>=35)])
+    data = data[(data['Cp']<35) & (data['dox'])].copy()
+
+    # Calculate GAPDH Cp for each condition (biorep + construct)
+    data = data.groupby(['exp','biorep','construct'])[data.columns].apply(get_housekeeping_qpcr).reset_index(drop=True)
+
+    # Combine technical reps (median)
+    stats = data.groupby(['exp','biorep','construct','primers','GAPDH_Cp'])[['Cp']].median().reset_index().dropna(subset='Cp')
+
+    # Exclude points (biorep/exp + primers) where Cp ~ Cp of negative controls (no-cDNA, no-RT)
+    stats = stats.groupby(['exp','primers'])[stats.columns].apply(get_negative_qpcr).reset_index(drop=True)
+    print('Remove points where Cp ~ Cp of negative controls')
+    display(stats[(stats['Cp'] >= stats['negative_Cp'])])
+    filtered = stats[(stats['Cp'] < stats['negative_Cp']) & ~(stats['construct'].isin(['no-RT','no-cDNA']))]
+
+    # Exclude conditions (biorep + construct) with low GAPDH expression (Cp >= 21)
+    print('Remove conditions with low GAPDH expression')
+    display(filtered[filtered['GAPDH_Cp'] >= 21])
+    filtered = filtered[filtered['GAPDH_Cp'] < 21]
+    filtered['expression'] = 2**(-filtered['Cp'])
+
+    # Normalize expression relative to GAPDH for each condition (biorep + construct)
+    filtered['delta_Cp'] = filtered['Cp'] - filtered['GAPDH_Cp']
+    filtered['norm_expression'] = 2**(-filtered['delta_Cp'])
+
     # Add metadata
     metadata = get_metadata(metadata_path/'construct-metadata.xlsx', 'applications')
     data = data.merge(metadata, how='left', on='construct')
+    filtered = filtered.merge(metadata, how='left', on='construct')
 
-    # Normalize expression to housekeeping gene (GAPDH)
-    data = data.groupby(['dox','construct','biorep'])[data.columns].apply(get_housekeeping).reset_index(drop=True)
-    data['delta_Cp'] = data['Cp'] - data['housekeeping_Cp']
-    data['expression'] = data['Cp'].apply(lambda x: 2**(-x))
-    data['norm_expression'] = data['delta_Cp'].apply(lambda x: 2**(-x))
+    # Calculate base delta_Cp for each condition (biorep + primers)
+    filtered = filtered.groupby(['exp','biorep','primers'])[filtered.columns].apply(get_control_qpcr).reset_index(drop=True)
 
-    # Compute expression relative to base gene construct
-    data = data.groupby(['dox','primers','biorep'])[data.columns].apply(lambda x: get_control(x, 'RC281')).reset_index(drop=True)
-    data = data.groupby(['dox','primers','biorep'])[data.columns].apply(lambda x: get_control(x, 'RC284')).reset_index(drop=True)
-    data['delta_delta_Cp'] = data['delta_Cp'] - data['RC281_Cp']
-    data.loc[data['construct'].isin(['RC284','RC285','RC286']), 'delta_delta_Cp'] = data.loc[data['construct'].isin(['RC284','RC285','RC286']), 'delta_Cp'] - data.loc[data['construct'].isin(['RC284','RC285','RC286']), 'RC284_Cp']
-    data['relative_expression'] = data['delta_delta_Cp'].apply(lambda x: 2**(-x))
+    # Exclude conditions (biorep + construct) missing their corresponding base gene 
+    # e.g., base gene previously excluded due to low amplification
+    print('Remove conditions missing their corresponding base gene')
+    display(filtered[filtered['base_delta_Cp'].isna()])
+    filtered.dropna(subset='base_delta_Cp', inplace=True)
 
-    # Calculate stats (combine technical replicates into one value per biorep)
-    # Calculate stats for bioreps
-    stats = data.groupby(['construct','dox','primers','biorep'])[['Cp','housekeeping_Cp','delta_Cp','expression','norm_expression','relative_expression']].median().reset_index()
-    stats = stats.merge(metadata, how='left', on='construct')
+    # Normalize expression relative to base gene (delta_delta_Cp) for each condition (biorep + primers)
+    filtered['delta_delta_Cp'] = filtered['delta_Cp'] - filtered['base_delta_Cp']
+    filtered['relative_expression'] = 2**(-filtered['delta_delta_Cp'])
     
-    return data, stats, metadata
+    return data, filtered, metadata
 
 # Load modeling results
 def load_modeling(base_path, which):
