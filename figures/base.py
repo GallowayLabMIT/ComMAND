@@ -197,7 +197,7 @@ def get_metadata(path, style='tuning'):
 
     metadata['color'] = metadata['group'].replace(group_palette)
     metadata['markers'] = 'o' #metadata['group'].replace(group_markers)
-    metadata['ts_label'] = metadata['ts_kind'].replace({'na': 'base', 'NT': 'OL', 'T': 'CL', 'none': '–'})
+    metadata['ts_label'] = metadata['ts_kind'].replace({'na': 'base', 'NT': 'OL', 'T': 'CL', '–': 'none'})
 
     if style=='tuning': return apply_style_tuning(metadata)
     elif style=='promoters': return apply_style_promoters(metadata)
