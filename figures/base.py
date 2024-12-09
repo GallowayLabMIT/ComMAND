@@ -32,7 +32,11 @@ rc_context = {'font.size': font_sizes['base_size'], 'font.family': 'sans-serif',
 figure_width = {'full': 6.8504, '1.5-column': 4.48819, '1-column': 3.34646}
 
 # Aesthetics for plotting
-scatter_kwargs = dict(s=4, jitter=0.2, linewidth=0.5, edgecolor='white', legend=False,)
+#scatter_kwargs = dict(s=4, jitter=0.2, linewidth=0.5, edgecolor='white', legend=False,)
+scatter_kwargs = dict(linestyle='none', errorbar='sd', markersize=4, markeredgewidth=0.5, markeredgecolor='white',
+                      err_kws=dict(linewidth=1, zorder=0), legend=False,)
+line_kwargs = dict(legend=False, dashes=False,  markersize=4, markeredgewidth=0.5, estimator=sp.stats.gmean, 
+                   errorbar=lambda x: (sp.stats.gmean(x) / sp.stats.gstd(x), sp.stats.gmean(x) * sp.stats.gstd(x)))
 annotate_kwargs = dict(test='t-test_ind', text_format='star', loc='inside', line_height=0, line_width=0.5, text_offset=-2)
 
 # Main color palette
@@ -331,6 +335,7 @@ def modify_norm_factor(df):
 # `load_plates` loads and gates data, renaming channels as needed
 def load_plates(data_group, base_path):
     if data_group == 'tuning': return load_plates_tuning(base_path)
+    elif data_group == 'ts_num': return load_plates_ts_num(base_path)
     elif data_group == 'miR_characterization': return load_plates_miR_characterization(base_path)
     elif data_group == 'plasmid_titration': return load_plates_plasmid_titration(base_path)
     elif data_group == 'two_gene': return load_plates_two_gene(base_path)
@@ -399,6 +404,42 @@ def load_plates_tuning(base_path):
     # Add missing gates
     gates.loc[len(gates.index)] = ['exp90.4',0,0,]  
     gates.loc[gates['exp']=='exp90.4', channel_list] = gates.loc[gates['exp']=='exp90.2', channel_list].values
+
+    # Indicate which channels are relevant for each experiment
+    gates.sort_values(['exp'], inplace=True)
+    gates['marker'] = 'mGL-A'
+    gates['output'] = 'mRuby2-A'
+
+    # Gate data by marker expression
+    data = data.groupby('exp')[data.columns].apply(lambda x: gate_data(x,gates))
+    data.reset_index(inplace=True, drop=True)
+    data['gated'] = data['expressing'] & (data['construct']!='UT')
+    
+    return data
+
+def load_plates_ts_num(base_path):
+
+    exp_path = base_path/'kasey'/'2024.12.04_exp092.3'/'export'
+
+    plates = pd.DataFrame({
+        'data_path': [exp_path],
+        'yaml_path': [exp_path/'wells.yaml'],
+        'biorep': [4],
+        'exp': ['exp092.3',]
+    })
+    
+    # Load data
+    channel_list = ['mRuby2-A','mGL-A']
+    data = rd.flow.load_groups_with_metadata(plates, columns=channel_list)
+
+    # Remove negative channel values
+    for c in channel_list: data = data[data[c]>0]
+
+    # Draw gates
+    gates = pd.DataFrame()
+    for channel in channel_list:
+        gates[channel] = data[data['construct']=='UT'].groupby(['exp'])[channel].apply(lambda x: x.quantile(0.999))
+    gates.reset_index(inplace=True)
 
     # Indicate which channels are relevant for each experiment
     gates.sort_values(['exp'], inplace=True)
@@ -966,13 +1007,20 @@ def load_data(base_path, metadata_path, which, metadata_style='tuning'):
 
 def load_data_tuning(base_path, metadata_path, metadata_style):
 
-    # Load and gate raw data
-    cache_path = rd.rootdir/'data'/('tuning.gzip')
-    data = pd.DataFrame()
-    if cache_path.is_file(): data = pd.read_parquet(cache_path)
-    else: 
-        data = load_plates('tuning', base_path)
-        data.to_parquet(rd.outfile(cache_path))
+    data_groups = ['tuning', 'ts_num']
+
+    data_list = []
+    for data_group in data_groups:
+        cache_path = rd.rootdir/'data'/(data_group+'.gzip')
+        data = pd.DataFrame()
+        if cache_path.is_file(): data = pd.read_parquet(cache_path)
+        else: 
+            data = load_plates(data_group, base_path)
+            data.to_parquet(rd.outfile(cache_path))
+        data_list.append(data)
+
+    # Combine data into a single dataframe
+    data = pd.concat(data_list, ignore_index=True)
 
     # Bin data and calculate statistics
     df_quantiles, df_stats = calculate_bins_stats(data[data['gated']])
