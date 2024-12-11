@@ -33,7 +33,7 @@ figure_width = {'full': 6.8504, '1.5-column': 4.48819, '1-column': 3.34646}
 
 # Aesthetics for plotting
 #scatter_kwargs = dict(s=4, jitter=0.2, linewidth=0.5, edgecolor='white', legend=False,)
-scatter_kwargs = dict(linestyle='none', errorbar='sd', markersize=4, markeredgewidth=0.5, markeredgecolor='white',
+scatter_kwargs = dict(linestyle='none', errorbar='ci', markersize=4, markeredgewidth=0.5, markeredgecolor='white',
                       err_kws=dict(linewidth=1, zorder=0), legend=False,)
 line_kwargs = dict(legend=False, dashes=False,  markersize=4, markeredgewidth=0.5, estimator=sp.stats.gmean, 
                    errorbar=lambda x: (sp.stats.gmean(x) / sp.stats.gstd(x), sp.stats.gmean(x) * sp.stats.gstd(x)))
