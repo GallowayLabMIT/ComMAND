@@ -340,6 +340,7 @@ def load_plates(data_group, base_path):
     elif data_group == 'plasmid_titration': return load_plates_plasmid_titration(base_path)
     elif data_group == 'two_gene': return load_plates_two_gene(base_path)
     elif data_group == 'piggybac': return load_plates_piggybac(base_path)
+    elif data_group == 'straight-in': return load_plates_straight_in(base_path)
     elif data_group == 'lenti_293T_MEF': return load_plates_lenti_293T_mef(base_path)
     elif data_group == 'lenti_tcell': return load_plates_lenti_tcell(base_path)
     elif data_group == 'lenti_neuron': return load_plates_lenti_neuron(base_path)
@@ -621,6 +622,41 @@ def load_plates_piggybac(base_path):
     # Indicate which channels are relevant for each experiment
     gates['marker'] = 'mGL-A'
     gates['output'] = 'mRuby2-A'
+
+    # Gate data by marker expression
+    data = data.groupby('exp')[data.columns].apply(lambda x: gate_data(x,gates))
+    data.reset_index(inplace=True, drop=True)
+    data['gated'] = data['expressing']
+    
+    return data
+
+def load_plates_straight_in(base_path):
+
+    plates = pd.DataFrame({
+        'data_path': [base_path/'Albert'/'Exp14'/'export', base_path/'Albert'/'Exp15'/'export', base_path/'Albert'/'Exp16'/'export',],
+        'yaml_path': [base_path/'Albert'/'Exp14'/'export'/'wells.yaml']*3,
+        'exp': ['Exp14', 'Exp15', 'Exp16'],
+        'biorep': [1,2,3]
+    })
+    
+    # Load data
+    channel_list = ['mScarlet2-A','mGreenLantern-A']
+    data = rd.flow.load_groups_with_metadata(plates, columns=channel_list)
+
+    # Remove negative channel values
+    for c in channel_list: data = data[data[c]>0]
+
+    # Draw gates manually 
+    gates = pd.DataFrame({
+        'mScarlet2-A': [3e3]*3,
+        'mGreenLantern-A': [1e4]*3,
+        'exp': ['Exp14', 'Exp15', 'Exp16']
+    })
+
+    # Indicate which channels are relevant for each experiment
+    gates.sort_values(['exp'], inplace=True)
+    gates['marker'] = 'mGreenLantern-A'
+    gates['output'] = 'mScarlet2-A'
 
     # Gate data by marker expression
     data = data.groupby('exp')[data.columns].apply(lambda x: gate_data(x,gates))
@@ -999,7 +1035,7 @@ def load_data(base_path, metadata_path, which, metadata_style='tuning'):
     elif which == 'plasmid_titration': return load_data_plasmid_titration(base_path, metadata_path)
     elif which == 'miR_characterization': return load_data_miR_characterization(base_path, metadata_path)
     elif which == 'two_gene': return load_data_two_gene(base_path, metadata_path)
-    elif which == 'piggybac': return load_data_piggybac(base_path, metadata_path)
+    elif which == 'piggybac': return load_data_piggybac(base_path, metadata_path) # PiggyBac and STRAIGHT-IN integrations
     elif which == 'lenti': return load_data_lenti(base_path, metadata_path) # all lentivirus data (all cell types + therapeutic genes)
     elif which == 'application': return load_data_application(base_path, metadata_path) # iPS11 and therapeutic gene transfections
     elif which == 'qPCR': return load_data_qpcr(base_path, metadata_path)
@@ -1143,16 +1179,24 @@ def load_data_two_gene(base_path, metadata_path):
 
 def load_data_piggybac(base_path, metadata_path):
 
-    # Load and gate raw data
-    cache_path = rd.rootdir/'data'/('piggybac.gzip')
-    data = pd.DataFrame()
-    if cache_path.is_file(): data = pd.read_parquet(cache_path)
-    else: 
-        data = load_plates('piggybac', base_path)
-        data.to_parquet(rd.outfile(cache_path))
+    data_groups = ['piggybac', 'straight-in']
+
+    data_list = []
+    for data_group in data_groups:
+        cache_path = rd.rootdir/'data'/(data_group+'.gzip')
+        data = pd.DataFrame()
+        if cache_path.is_file(): data = pd.read_parquet(cache_path)
+        else: 
+            data = load_plates(data_group, base_path)
+            data.to_parquet(rd.outfile(cache_path))
+        data['vector'] = data_group
+        data_list.append(data)
+
+    # Combine data into a single dataframe
+    data = pd.concat(data_list, ignore_index=True)
 
     # Bin data and calculate statistics
-    df_quantiles, df_stats = calculate_bins_stats(data[data['gated']])
+    df_quantiles, df_stats = calculate_bins_stats(data[data['gated']], by=['construct','exp','biorep','vector'])
 
     # Add metadata
     metadata = get_metadata(metadata_path/'construct-metadata.xlsx')
@@ -1374,3 +1418,17 @@ def load_modeling_missplicing(base_path):
     _, df_stats = calculate_bins_stats(data, by=['model','condition','risc','moi'])
 
     return data, df_stats
+
+# later: move modeling results to different location
+#   current base_path = rd.datadir/'projects'/'miR-iFFL'/'STRAIGHT-IN lines'
+def load_ddpcr(base_path, metadata_path):
+
+    # Load data
+    ddpcr_path = rd.datadir/'projects'/'miR-iFFL'/'STRAIGHT-IN lines'
+    ddpcr = pd.read_excel(ddpcr_path/'ddPCR.xlsx', header=1,)
+
+    # Add metadata
+    metadata = get_metadata(metadata_path/'construct-metadata.xlsx')
+    ddpcr = ddpcr.merge(metadata, how='left', on='construct')
+
+    return ddpcr
