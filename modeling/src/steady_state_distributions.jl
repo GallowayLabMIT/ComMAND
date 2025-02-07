@@ -163,3 +163,34 @@ hidespines!(ax, :t)
 #axislegend(ax, position=:rb)
 f
 end
+
+# Generate a whole dataframe of parameter values
+N=3*10000*2
+copy_number_vals = zeros(N)
+is_closed_loop_vals = zeros(N)
+distribution_width_values = zeros(N)
+protein_vals = zeros(N)
+idx = 1
+for d_width        = [2e-5, 3e-5, 1e-5],
+    is_closed_loop = [true, false]
+
+    distribution = truncated(Normal(0.000333, d_width), lower=1e-7)
+
+    for n = 1:10000
+        copy_number = 30
+        copy_number_vals[idx] = copy_number
+        is_closed_loop_vals[idx] = is_closed_loop
+        distribution_width_values[idx] = d_width
+        protein_vals[idx] = calculate_protein(copy_number, rand(distribution), is_closed_loop)
+    end
+end
+
+distribution_df = DataFrame(
+    copy_number=copy_number_vals,
+    is_closed_loop=is_closed_loop_vals,
+    distribution_width=distribution_width_values,
+    protein=protein_vals
+)
+
+
+Parquet2.writefile("$outdir/distribution_df.gzip", distribution_df; compression_codec=:gzip)
