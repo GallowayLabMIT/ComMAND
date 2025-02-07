@@ -109,12 +109,46 @@ axislegend(ax, position=:lt)
 f
 end
 
+begin
+f = Figure()
+ax = Axis(f[1,1], xlabel="α_p", xscale=log10, yscale=log10, ylabel="Steady state protein", title="Sweep α_p, post-linear")
+xrange = logrange_around_param(0.000333, 1, 50)
+lines!(ax, xrange, calculate_protein.(150, xrange, false), label="Open loop")
+lines!(ax, xrange, calculate_protein.(150, xrange, true), label="Closed loop")
+hidespines!(ax, :r)
+hidespines!(ax, :t)
+axislegend(ax, position=:lt)
+f
+end
+
 # Plot explicit output distributions, pulling from (zero-truncated) normal distributions
 begin
 f = Figure()
 ax = Axis(f[1,1], xlabel="Steady state protein", xscale=log10, ylabel="Density", title="OL and CL distributions")
 for (idx, d_width) ∈ enumerate([2e-5, 3e-5, 1e-5])
     distribution = truncated(Normal(0.000333, d_width), lower=1e-7)
+    density!(ax, calculate_protein.(30, rand(distribution, 10000), true),
+        color=(:black,0.0), strokecolor=("#008080", 0.8), strokewidth=3,
+        label="Closed loop"
+    )
+    density!(ax, calculate_protein.(30, rand(distribution, 10000), false),
+        color=(:black,0.0), strokecolor=("#808080", 0.8), strokewidth=3,
+        label="Open loop"
+    )
+end
+hidespines!(ax, :r)
+hidespines!(ax, :t)
+#axislegend(ax, position=:rb)
+f
+end
+
+# Plot explicit output distributions, pulling from (zero-truncated) normal distributions
+begin
+f = Figure()
+ax = Axis(f[1,1], xlabel="Steady state protein", xscale=log10, ylabel="Density", title="?OL and CL distributions")
+d_width = 1e-5
+for (idx, center) ∈ enumerate(logrange_around_param(0.000333, 1, 50))
+    distribution = truncated(Normal(center, d_width), lower=1e-7)
     density!(ax, calculate_protein.(30, rand(distribution, 10000), true),
         color=(:black,0.0), strokecolor=("#008080", 0.8), strokewidth=3,
         label="Closed loop"
