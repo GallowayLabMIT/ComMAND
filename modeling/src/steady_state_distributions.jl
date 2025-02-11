@@ -67,7 +67,50 @@ function calculate_protein(copy_number, α_p, is_closed_loop)
     protein(R_vals[1], params)
 end
 
+function calculate_slope(Rtot, is_closed_loop)
+    params = deepcopy(param_dict)
+    params[:regulated_copy] = 10000
+    params[:Rtot] = Rtot
+    if !is_closed_loop
+        params[:k_deg] = 0
+    end
+    low_R_vals = find_R_vals(params)
+    @assert length(low_R_vals) == 1
+    low_protein = protein(low_R_vals[1], params)
+    params[:regulated_copy] = 10100
+    high_R_vals = find_R_vals(params)
+    @assert length(high_R_vals) == 1
+    high_protein = protein(high_R_vals[1], params)
+
+    (high_protein - low_protein) / 100
+end
+
 logrange_around_param(p, decades, n) = 10.0 .^ range(log10(p) - (decades / 2.0), log10(p) + (decades / 2.0), n)
+
+
+begin
+f = Figure()
+ax = Axis(f[1,1], xlabel="R_tot", xscale=log10, ylabel="Slope", title="Post-transition (RISC limited) slope")
+
+r_range = logrange_around_param(1e5, 2, 50)
+lines!(ax, r_range, calculate_slope.(r_range, false), label="Open loop")
+lines!(ax, r_range, calculate_slope.(r_range, true), label="Closed loop")
+hidespines!(ax, :r)
+hidespines!(ax, :t)
+axislegend(ax, position=:rc)
+f
+end
+
+begin
+f = Figure()
+ax = Axis(f[1,1], xlabel="R_tot", xscale=log10, ylabel="Δ slope", title="Post-transition (RISC limited) Δ slope")
+
+r_range = logrange_around_param(1e5, 2, 50)
+lines!(ax, r_range, calculate_slope.(r_range, false) .- calculate_slope.(r_range, true))
+hidespines!(ax, :r)
+hidespines!(ax, :t)
+f
+end
 
 # Sanity check that our closed loop/open loop predictions look correct
 begin
@@ -88,6 +131,18 @@ end
 begin
 f = Figure()
 ax = Axis(f[1,1], xlabel="α_p", xscale=log10, ylabel="Steady state protein", title="Sweep α_p, within pre-linear")
+xrange = logrange_around_param(0.000333, 1, 50)
+lines!(ax, xrange, calculate_protein.(30, xrange, false), label="Open loop")
+lines!(ax, xrange, calculate_protein.(30, xrange, true), label="Closed loop")
+hidespines!(ax, :r)
+hidespines!(ax, :t)
+axislegend(ax, position=:lt)
+f
+end
+
+begin
+f = Figure()
+ax = Axis(f[1,1], xlabel="α_p", xscale=log10, yscale=log10, ylabel="Steady state protein", title="Sweep α_p, within pre-linear")
 xrange = logrange_around_param(0.000333, 1, 50)
 lines!(ax, xrange, calculate_protein.(30, xrange, false), label="Open loop")
 lines!(ax, xrange, calculate_protein.(30, xrange, true), label="Closed loop")
@@ -194,3 +249,26 @@ distribution_df = DataFrame(
 
 
 Parquet2.writefile("$outdir/distribution_df.gzip", distribution_df; compression_codec=:gzip)
+
+# Generate a dataframe for the slope dataframe
+N=2*500
+is_closed_loop_vals = zeros(N)
+rtot_values = zeros(N)
+slope_values = zeros(N)
+idx = 1
+for rtot           = logrange_around_param(1e5, 2, 500),
+    is_closed_loop = [true, false]
+
+    is_closed_loop_vals[idx] = is_closed_loop
+    rtot_values[idx] = rtot
+    slope_values[idx] = calculate_slope(rtot, is_closed_loop)
+end
+
+rtot_slope_df = DataFrame(
+    is_closed_loop=is_closed_loop_vals,
+    rtot=rtot_values,
+    slope=slope_values
+)
+
+
+Parquet2.writefile("$outdir/slope_df.gzip", distribution_df; compression_codec=:gzip)
