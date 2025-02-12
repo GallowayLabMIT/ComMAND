@@ -109,3 +109,69 @@ for (key, val) ∈ param_dict
 end
 
 Parquet2.writefile("$outdir/sweep_df.gzip", sweep_df; compression_codec=:gzip)
+
+function calculate_slope(param, value, is_closed_loop)
+    params = deepcopy(param_dict)
+    params[param] = value
+    params[:regulated_copy] = 100000
+    if !is_closed_loop
+        params[:k_deg] = 0
+    end
+    low_R_vals = find_R_vals(params)
+    @assert length(low_R_vals) == 1
+    low_protein = protein(low_R_vals[1], params)
+    params[:regulated_copy] = 100100
+    high_R_vals = find_R_vals(params)
+    @assert length(high_R_vals) == 1
+    high_protein = protein(high_R_vals[1], params)
+
+    (high_protein - low_protein) / 100
+end
+
+slope_sweep_df = DataFrame(
+    param=String[],
+    param_val=Float64[],
+    is_closed_loop=Bool[],
+    slope=Float64[],
+)
+
+# Calculate protein values & plot
+for (key, val) ∈ param_dict
+    if key ∈ [:regulated_copy]
+        continue
+    end
+
+    if key == :ζ
+        param_range = 0.0:0.1:1.0
+    else
+        param_range = logrange_around_param(val, 1, 11)
+    end
+    f = Figure()
+    ax = Axis(f[1,1], xlabel="$(String(key))", xscale=log10, ylabel="Slope", title="Sweep of $(String(key))")
+    lines!(ax, param_range, calculate_slope.(key, param_range, false), label="Open loop")
+    lines!(ax, param_range, calculate_slope.(key, param_range, true), label="Closed loop")
+
+    df = DataFrame(
+        param=String(key),
+        param_val=param_range,
+        is_closed_loop=false,
+        slope=calculate_slope.(key, param_range, false)
+    )
+    append!(slope_sweep_df,df)
+    df = DataFrame(
+        param=String(key),
+        param_val=param_range,
+        is_closed_loop=true,
+        slope=calculate_slope.(key, param_range, true)
+    )
+    append!(slope_sweep_df,df)
+
+    hidespines!(ax, :r)
+    hidespines!(ax, :t)
+    axislegend(ax, position=:rb)
+    save("$outdir/slope_$(String(key)).pdf", f)
+    save("$outdir/slope_$(String(key)).svg", f)
+end
+outdir
+
+Parquet2.writefile("$outdir/slope_sweep_df.gzip", sweep_df; compression_codec=:gzip)
