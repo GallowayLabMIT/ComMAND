@@ -1367,6 +1367,17 @@ def load_modeling_param_sweeps(base_path):
     result = slopes.groupby(['param','param_val_norm'])[slopes.columns].apply(modify_norm_factor).rename('norm_factor').reset_index()
     slopes['norm_factor'] = result['norm_factor']
     slopes['slope_norm'] = slopes['slope'] * slopes['norm_factor']
+    slopes['gene'] = 'output'
+
+    # Compute slope for unregulated gene
+    by = ['param','param_val','param_val_norm']
+    slopes_unreg = data.groupby(by)[data.columns].apply(lambda x: get_slope_instant(x, *['copy_num','unreg'])).rename('slope').reset_index()
+    slopes_unreg['norm_factor'] = result['norm_factor']
+    slopes_unreg['slope_norm'] = slopes_unreg['slope'] * slopes_unreg['norm_factor']
+    slopes_unreg['gene'] = 'marker'
+
+    # Combine into a single dataframe
+    slopes = pd.concat([slopes, slopes_unreg])
 
     return data, slopes
 
